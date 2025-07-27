@@ -1,0 +1,13 @@
+vscode/*
+
+# Environments
+.env
+.envrc
+.venv
+env/
+venv/
+ENV/
+mlops-assign1-venv/
+
+env.bak/
+venv.bak/

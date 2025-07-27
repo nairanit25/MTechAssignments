@@ -1,0 +1,12 @@
+ipykernel
+pandas
+numpy
+pydentic
+scikit-learn
+numpy
+joblib
+mlflow
+imblearn
+optuna
+dvc
+Flask
