@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     
     # Data Configuration
     DATA_DIR: str = "./data"
-    DEFAULT_DATA_FILE: str = "housing_data.csv"
+    DEFAULT_DATA_FILE: str = "Housing.csv"
     
     # Monitoring
     PROMETHEUS_PORT: int = 9090
