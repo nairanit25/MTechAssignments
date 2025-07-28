@@ -10,3 +10,8 @@ mlops-assign1-venv/
 
 env.bak/
 venv.bak/
+logs/
+src/__pycache__/*
+src/api/__pycache__/*
+src/utils/__pycache__/*
+src/models/__pycache__/*

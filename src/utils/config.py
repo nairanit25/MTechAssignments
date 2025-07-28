@@ -4,7 +4,7 @@ Configuration management for the Housing Price Prediction system.
 
 import os
 from typing import List
-from pydantic import BaseSettings
+from pydantic_settings  import BaseSettings
 
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     ENABLE_AUTO_RETRAINING: bool = True
     
     class Config:
-        env_file = ".env"
+        env_file = "configs/.env"
         case_sensitive = True
 
 # Global settings instance
