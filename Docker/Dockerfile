@@ -46,12 +46,12 @@ COPY configs/ ./configs/
 # Create necessary directories
 RUN mkdir -p /app/models /app/data /app/logs && \
     chown -R mlops:mlops /app
-
+ 
 # Switch to non-root user
 USER mlops
 
 # Expose port
-EXPOSE 8000
+EXPOSE 5000 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
