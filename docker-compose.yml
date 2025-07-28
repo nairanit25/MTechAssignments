@@ -41,10 +41,10 @@ services:
     working_dir: /mlflow
     command: >
       bash -c "
-        pip install setuptools==80.9.0  mlflow==2.12.1 && \
+        pip install setuptools>=69.5.1  mlflow==2.12.1 && \
         mlflow server \
         --backend-store-uri sqlite:///mlflow.db  \
-        --default-artifact-root ./artifacts  \
+        --default-artifact-root /mlflow/artifacts  \
         --host 0.0.0.0  \
         --port 5000
       "
