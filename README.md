@@ -11,3 +11,18 @@ Docker
 Flask or FastAPI
 GitHub Actions
 Logging module (basic); Optional: Prometheus/Grafana
+
+
+mlops-housing-prediction/
+├── .github/workflows/         # CI/CD pipelines
+├── src/
+│   ├── api/                   # FastAPI application
+│   ├── models/                # ML model implementations
+│   ├── data/                  # Data processing utilities
+│   ├── monitoring/            # Prometheus metrics
+│   └── utils/                 # Shared utilities
+├── tests/                     # Test suites
+├── docker/                    # Docker configurations
+├── configs/                   # Configuration files
+├── data/                      # Dataset storage
+

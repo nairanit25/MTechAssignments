@@ -1,7 +1,6 @@
 vscode/*
 
 # Environments
-.env
 .envrc
 .venv
 env/
