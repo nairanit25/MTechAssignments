@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # Main Housing Price Prediction Application
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./logs:/app/logs
+    depends_on:
+      #- redis
+      - mlflow
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      
+  # MLflow experiment tracking
+  mlflow:
+    image: python:3.12-slim
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+      - ./mlflow-artifacts:/mlflow/artifacts
+    working_dir: /mlflow
+    command: >
+      bash -c "
+        pip install setuptools==80.9.0  mlflow==2.12.1 && \
+        mlflow server \
+        --backend-store-uri sqlite:///mlflow.db  \
+        --default-artifact-root ./artifacts  \
+        --host 0.0.0.0  \
+        --port 5000
+      "
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  
+
+
+
+
+networks:
+  mlops-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  prometheus-data:
+  grafana-data:

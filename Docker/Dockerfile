@@ -41,7 +41,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy application code
 COPY src/ ./src/
-#COPY configs/ ./configs/
+COPY configs/ ./configs/
 
 # Create necessary directories
 RUN mkdir -p /app/models /app/data /app/logs && \
