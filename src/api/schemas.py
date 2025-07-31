@@ -10,9 +10,9 @@ class CaliforniaHousing(BaseModel):
     """Housing features for prediction."""
     median_income: float = Field(..., gt=0, description="Median income in block group")
     housing_median_age: float = Field(..., gt=0, description="Median house age in block group")
-    avg_rooms_per_household: float = Field(..., description="Average number of rooms per household")
-    avg_num_bedrooms_per_house: float = Field(..., description="Average number of bedrooms per household")
-    Population: float = Field(..., description="Block group population")
+    avg_rooms_per_household: float = Field(..., ge=1, le=20, description="Average number of rooms per household")
+    avg_num_bedrooms_per_house: float = Field(...,  ge=1, le=20,  description="Average number of bedrooms per household")
+    Population: float = Field(..., ge=1, description="Block group population")
     avg_household_members: float = Field(..., ge=32.0, le=42.0, description="Average number of household members")
     Latitude: float = Field(..., description="LatBlock group latitudeitude (California range)")
     Longitude: float = Field(..., ge=-124.0, le=-114.0, description="Block group longitude (California range)")

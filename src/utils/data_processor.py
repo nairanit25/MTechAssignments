@@ -115,26 +115,8 @@ class DataLoader:
             X, y, 
             test_size=test_size, 
             random_state=random_state
-        )
-    
-    def validate_features(self, features: dict) -> bool:
-        """Validate input features."""
-        
-        # Basic validation
-        try:
-            if features['bedrooms'] < 1 or features['bedrooms'] > 20:
-                return False
-            if features['bathrooms'] < 0.5 or features['bathrooms'] > 10:
-                return False
-            if features['sqft_living'] < 300 or features['sqft_living'] > 15000:
-                return False
-            # Add more validations as needed
-            
-            return True
-            
-        except (TypeError, ValueError, KeyError):
-            return False
-    
+        )   
+
     def get_feature_statistics(self, X: pd.DataFrame) -> dict:
         """Get basic statistics about features."""
         return {
