@@ -8,41 +8,23 @@ import time
 
 class CaliforniaHousing(BaseModel):
     """Housing features for prediction."""
-    bedrooms: int = Field(..., ge=1, le=20, description="Number of bedrooms")
-    bathrooms: float = Field(..., ge=0.5, le=10, description="Number of bathrooms")
-    sqft_living: int = Field(..., ge=300, le=15000, description="Living area square footage")
-    sqft_lot: int = Field(..., ge=500, le=100000, description="Lot size square footage")
-    floors: float = Field(..., ge=1, le=4, description="Number of floors")
-    waterfront: int = Field(..., ge=0, le=1, description="Waterfront property (0/1)")
-    view: int = Field(..., ge=0, le=4, description="View rating (0-4)")
-    condition: int = Field(..., ge=1, le=5, description="Property condition (1-5)")
-    grade: int = Field(..., ge=3, le=13, description="Building grade (3-13)")
-    sqft_above: int = Field(..., ge=300, le=15000, description="Above ground square footage")
-    sqft_basement: int = Field(..., ge=0, le=5000, description="Basement square footage")
-    yr_built: int = Field(..., ge=1900, le=2025, description="Year built")
-    yr_renovated: int = Field(..., ge=0, le=2025, description="Year renovated (0 if never)")
-    zipcode: int = Field(..., ge=98001, le=98199, description="Property zipcode")
-    lat: float = Field(..., ge=47.1, le=47.8, description="Latitude")
-    long: float = Field(..., ge=-122.6, le=-121.3, description="Longitude")
-    sqft_living15: int = Field(..., ge=300, le=15000, description="Living area of 15 nearest neighbors")
-    sqft_lot15: int = Field(..., ge=500, le=100000, description="Lot size of 15 nearest neighbors")
-
-    median_income: confloat(gt=0) = Field(..., description="Median income in block group")
-    housing_median_age: conint(ge=0, le=100) = Field(..., description="Median house age in block group")
-    avg_rooms_per_household: confloat(gt=0) = Field(..., description="Average number of rooms per household")
-    avg_num_bedrooms_per_house: confloat(gt=0) = Field(..., description="Average number of bedrooms per household")
-    Population: conint(ge=0) = Field(..., description="Block group population")
-    avg_household_members: confloat(gt=0) = Field(..., description="Average number of household members")
-    Latitude: confloat(ge=32.0, le=42.0) = Field(..., description="LatBlock group latitudeitude (California range)")
-    Longitude: confloat(ge=-124.0, le=-114.0) = Field(..., description="Block group longitude (California range)")
+    median_income: float = Field(..., gt=0, description="Median income in block group")
+    housing_median_age: float = Field(..., gt=0, description="Median house age in block group")
+    avg_rooms_per_household: float = Field(..., description="Average number of rooms per household")
+    avg_num_bedrooms_per_house: float = Field(..., description="Average number of bedrooms per household")
+    Population: float = Field(..., description="Block group population")
+    avg_household_members: float = Field(..., ge=32.0, le=42.0, description="Average number of household members")
+    Latitude: float = Field(..., description="LatBlock group latitudeitude (California range)")
+    Longitude: float = Field(..., ge=-124.0, le=-114.0, description="Block group longitude (California range)")
       
-
+    '''
     @validator('yr_renovated')
     def validate_renovation_year(cls, v, values):
         """Validate renovation year is after build year."""
         if v > 0 and 'yr_built' in values and v < values['yr_built']:
             raise ValueError('Renovation year cannot be before build year')
         return v
+    '''
 
 class PredictionRequest(BaseModel):
     """Request schema for housing price prediction."""
