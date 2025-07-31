@@ -70,36 +70,18 @@ class DataLoader:
             logger.info(f"Features present in the origional housing dataset: {X.columns}")
             logger.info(f"Target variable in the housing dataset: median_house_value")
             
-            logger.info(f"Feature statistics: {get_feature_statistics(X)}")
+            logger.info(f"Feature statistics: {self.get_feature_statistics(X)}")
 
-            # Feature engineering
+            #Handle Outliers
+
+            # Possible Feature engineering
+                #Avg_Rooms_ per_Person
+                #Population_Density = Population / avg_household_members -> Higher values may indicate urban areas
+                #Urban_proximity
+            
             '''
             
-            # Select features for modeling
-            feature_columns = [
-                'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors',
-                'waterfront', 'view', 'condition', 'grade', 'sqft_above',
-                'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode',
-                'lat', 'long', 'sqft_living15', 'sqft_lot15'
-            ]
-            
-            # Ensure all feature columns exist
-            missing_cols = [col for col in feature_columns if col not in df.columns]
-            if missing_cols:
-                logger.warning(f"Missing columns: {missing_cols}")
-                # Add missing columns with default values
-                for col in missing_cols:
-                    df[col] = 0
-            
-            X = df[feature_columns]
-            
-            # Handle target variable
-            if 'price' in df.columns:
-                y = df['price']
-            else:
-                # If no price column, create dummy target
-                logger.warning("No price column found, creating dummy target")
-                y = pd.Series(np.random.uniform(100000, 1000000, len(df)))
+                     
             
             # Handle outliers (simple approach)
             Q1 = y.quantile(0.25)
@@ -137,18 +119,6 @@ class DataLoader:
     
     def validate_features(self, features: dict) -> bool:
         """Validate input features."""
-        required_features = [
-            'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors',
-            'waterfront', 'view', 'condition', 'grade', 'sqft_above',
-            'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode',
-            'lat', 'long', 'sqft_living15', 'sqft_lot15'
-        ]
-        
-        # Check if all required features are present
-        missing_features = [f for f in required_features if f not in features]
-        if missing_features:
-            logger.error(f"Missing required features: {missing_features}")
-            return False
         
         # Basic validation
         try:

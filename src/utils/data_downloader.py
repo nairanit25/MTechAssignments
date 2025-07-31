@@ -18,6 +18,6 @@ df = pd.DataFrame(housing.data, columns=housing.feature_names)
 df['MedHouseVal'] = housing.target
 
 # Save the DataFrame to a CSV file
-df.to_csv('data1/california_housing.csv', index=False)
+df.to_csv('data/california_housing.csv', index=False)
 
 logger.info("Dataset downloaded and saved to data/california_housing.csv")

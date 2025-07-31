@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field, validator
 import time
 
-class HouseFeatures(BaseModel):
+class CaliforniaHousing(BaseModel):
     """Housing features for prediction."""
     bedrooms: int = Field(..., ge=1, le=20, description="Number of bedrooms")
     bathrooms: float = Field(..., ge=0.5, le=10, description="Number of bathrooms")
@@ -27,12 +27,15 @@ class HouseFeatures(BaseModel):
     sqft_living15: int = Field(..., ge=300, le=15000, description="Living area of 15 nearest neighbors")
     sqft_lot15: int = Field(..., ge=500, le=100000, description="Lot size of 15 nearest neighbors")
 
-    @validator('sqft_above')
-    def validate_sqft_above(cls, v, values):
-        """Validate that sqft_above is reasonable compared to sqft_living."""
-        if 'sqft_living' in values and v > values['sqft_living']:
-            raise ValueError('sqft_above cannot be greater than sqft_living')
-        return v
+    median_income: confloat(gt=0) = Field(..., description="Median income in block group")
+    housing_median_age: conint(ge=0, le=100) = Field(..., description="Median house age in block group")
+    avg_rooms_per_household: confloat(gt=0) = Field(..., description="Average number of rooms per household")
+    avg_num_bedrooms_per_house: confloat(gt=0) = Field(..., description="Average number of bedrooms per household")
+    Population: conint(ge=0) = Field(..., description="Block group population")
+    avg_household_members: confloat(gt=0) = Field(..., description="Average number of household members")
+    Latitude: confloat(ge=32.0, le=42.0) = Field(..., description="LatBlock group latitudeitude (California range)")
+    Longitude: confloat(ge=-124.0, le=-114.0) = Field(..., description="Block group longitude (California range)")
+      
 
     @validator('yr_renovated')
     def validate_renovation_year(cls, v, values):
@@ -43,7 +46,7 @@ class HouseFeatures(BaseModel):
 
 class PredictionRequest(BaseModel):
     """Request schema for housing price prediction."""
-    features: HouseFeatures = Field(..., description="Housing features for prediction")
+    features: CaliforniaHousing = Field(..., description="Housing features for prediction")
     model_preference: Optional[str] = Field(None, description="Preferred model name")
     return_confidence: bool = Field(True, description="Whether to return confidence score")
     
