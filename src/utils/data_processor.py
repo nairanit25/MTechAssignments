@@ -41,13 +41,23 @@ class DataLoader:
         try:
             # Make a copy to avoid modifying original data
             housing_df = df.copy()
-
+            
             logger.info(f" data: {X.shape[0]} samples in Housing dataset with , {X.shape[1]} features")
 
             logger.info("Null values in the Housing dataset: {housing_df.isnull().sum()}")
             logger.info("NA  records in the Housingdataset: {housing_df.isna().sum()}")
-            
-            housing_df = housing_df.drop(columns=['ocean_proximity'])
+
+            housing_df = df.copy()
+            housing_df.rename(columns={
+                'HouseAge': 'housing_median_age',
+                'MedInc': 'median_income',
+                'AveRooms': 'avg_rooms_per_household',
+                'AveBedrms': 'avg_num_bedrooms_per_house',
+                'MedHouseVal': 'median_house_value',
+                'AveOccup': 'avg_household_members'
+            }, inplace=True)
+
+            housing_df.head(2)
                        
             # Handle missing values
             housing_df = housing_df.fillna(housing_df.median(numeric_only=True))
@@ -60,7 +70,7 @@ class DataLoader:
             logger.info(f"Features present in the origional housing dataset: {X.columns}")
             logger.info(f"Target variable in the housing dataset: median_house_value")
             
-            
+            logger.info(f"Feature statistics: {get_feature_statistics(X)}")
 
             # Feature engineering
             '''
@@ -122,8 +132,7 @@ class DataLoader:
         return train_test_split(
             X, y, 
             test_size=test_size, 
-            random_state=random_state,
-            stratify=None  # Can't stratify continuous targets
+            random_state=random_state
         )
     
     def validate_features(self, features: dict) -> bool:
