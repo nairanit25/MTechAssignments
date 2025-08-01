@@ -40,10 +40,8 @@ class DataLoader:
         """Preprocess the housing data."""
         try:
             # Make a copy to avoid modifying original data
-            housing_df = df.copy()
+            housing_df = df.copy()           
             
-            logger.info(f" data: {X.shape[0]} samples in Housing dataset with , {X.shape[1]} features")
-
             logger.info("Null values in the Housing dataset: {housing_df.isnull().sum()}")
             logger.info("NA  records in the Housingdataset: {housing_df.isna().sum()}")
 
