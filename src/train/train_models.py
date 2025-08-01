@@ -17,6 +17,7 @@ from src.models.linear_regression import LinearRegressionModel
 from src.utils.data_processor import DataLoader
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
+import psutil as ps
 
 # Setup logging
 logger = setup_logger(__name__, log_file="./logs/models.log")
@@ -36,9 +37,9 @@ def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
     
     with mlflow.start_run(nested=True):
         # Log parameters
-        mlflow.log_param('algorithm', 'linear_regression')
-        mlflow.log_param('regularization', regularization)
-        mlflow.log_param('alpha', alpha)
+        mlflow.log_param('algorithm:', 'linear_regression')
+        mlflow.log_param('regularization:', regularization)
+        mlflow.log_param('alpha:', alpha)
         
         # Train model
         train_metrics = model.train(
@@ -180,7 +181,17 @@ def main():
     
     with mlflow.start_run(run_name="model_comparison"):
         for algorithm in args.algorithms:
-            logger.info(f"Training {algorithm}")
+            logger.info(f"Starting Training {algorithm}")
+
+            cpu_percent = psutil.cpu_percent(interval=1)
+            memory_percent = psutil.virtual_memory().percent
+            disk_percent = psutil.disk_usage('/').percent
+
+            mlflow.log_metric("cpu_usage: ", cpu_percent)
+            mlflow.log_metric("ram_usage:", memory_percent)
+            mlflow.log_metric("disk_percent:", disk_percent)
+
+            
     '''       
             if args.optimize:
                 # Hyperparameter optimization
