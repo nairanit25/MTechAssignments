@@ -13,13 +13,13 @@ import mlflow.sklearn
 from sklearn.model_selection import train_test_split
 import optuna
 
-from src.models import LinearRegressionModel
-from src.utils import DataLoader
+from src.models.linear_regression import LinearRegressionModel
+from src.utils.data_processor import DataLoader
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
 
 # Setup logging
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, log_file="./logs/models.log")
 
 def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
     """Train linear regression model with optional hyperparameter optimization."""
@@ -181,7 +181,7 @@ def main():
     with mlflow.start_run(run_name="model_comparison"):
         for algorithm in args.algorithms:
             logger.info(f"Training {algorithm}")
-     '''       
+    '''       
             if args.optimize:
                 # Hyperparameter optimization
                 best_params, best_score = optimize_hyperparameters(

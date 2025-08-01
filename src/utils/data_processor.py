@@ -42,6 +42,8 @@ class DataLoader:
             # Make a copy to avoid modifying original data
             housing_df = df.copy()           
             
+            self.perform_eda(df)
+
             logger.info("Null values in the Housing dataset: {housing_df.isnull().sum()}")
             logger.info("NA  records in the Housingdataset: {housing_df.isna().sum()}")
 
@@ -123,3 +125,8 @@ class DataLoader:
             'missing_values': X.isnull().sum().to_dict(),
             'statistics': X.describe().to_dict()
         }
+    
+    def perform_eda(self, df: pd.DataFrame):
+        from ydata_profiling import ProfileReport
+        housing_report=ProfileReport(df)
+        housing_report.to_file("./logs/housing_report.html")

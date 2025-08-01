@@ -9,8 +9,7 @@ optuna==3.6.1
 joblib==1.5.0
 dvc==3.50.1
 pydantic-settings>=2.9.2
-
-
+ydata_profiling==4.16.1
 #####
 #imblearn
 #evidently==0.4.18
