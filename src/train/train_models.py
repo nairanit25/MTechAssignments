@@ -124,18 +124,15 @@ def train_decision_tree(X_train, y_train, X_val, y_val, trial=None):
         return val_metrics['r2']
 '''
 
-'''
-def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, n_trials=100):
+def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, X_test, y_test, n_trials=100):
     """Optimize hyperparameters using Optuna."""
     logger.info(f"Starting hyperparameter optimization for {algorithm}")
     
     def objective(trial):
         if algorithm == 'linear_regression':
-            return train_linear_regression(X_train, y_train, X_val, y_val, trial)
-        elif algorithm == 'decision_tree':
-            return train_decision_tree(X_train, y_train, X_val, y_val, trial)
-        elif algorithm == 'random_forest':
-            return train_random_forest(X_train, y_train, X_val, y_val, trial)
+            return train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, trial)
+        #elif algorithm == 'decision_tree':
+        #    return train_decision_tree(X_train, y_train, X_val, y_val, trial)        
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
     
@@ -147,7 +144,7 @@ def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, n_trials
     logger.info(f"Best score for {algorithm}: {study.best_value:.4f}")
     
     return study.best_params, study.best_value
-'''
+
 def main():
     """Main training script."""
     parser = argparse.ArgumentParser(description='ML models training for housing price prediction')
@@ -194,13 +191,13 @@ def main():
             mlflow.log_metric("disk_percent ", disk_percent)        
            
             if args.optimize:
-                '''
+                 
                 # Hyperparameter optimization
                 best_params, best_score = optimize_hyperparameters(
-                    algorithm, X_train, y_train, X_val, y_val, args.n_trials
+                    algorithm, X_train, y_train, X_val, y_val, X_test, y_test, args.n_trials
                 )
                 results[algorithm] = {'best_params': best_params, 'best_score': best_score}
-                '''
+                 
                 # Train final model with best parameters
                 if algorithm == 'linear_regression':
                     final_score = train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test)
