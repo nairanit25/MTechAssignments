@@ -53,8 +53,8 @@ class LinearRegressionModel(BaseModel):
         train_predictions = self.model.predict(X)
         training_metrics = {
             'train_mse': np.mean((y - train_predictions) ** 2),
-            'train_rmse': np.sqrt(np.mean((y - train_predictions) ** 2)),
             'train_mae': np.mean(np.abs(y - train_predictions)),
+            'train_rmse': np.sqrt(np.mean((y - train_predictions) ** 2)),            
             'train_r2': self.model.score(X, y)
         }
         

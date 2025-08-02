@@ -37,9 +37,9 @@ def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
     
     with mlflow.start_run(nested=True):
         # Log parameters
-        mlflow.log_param('algorithm:', 'linear_regression')
-        mlflow.log_param('regularization:', regularization)
-        mlflow.log_param('alpha:', alpha)
+        mlflow.log_param('algorithm ', 'linear_regression')
+        mlflow.log_param('regularization ', regularization)
+        mlflow.log_param('alpha ', alpha)
         
         # Train model
         train_metrics = model.train(
@@ -68,6 +68,7 @@ def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
         logger.info(f"Linear Regression - Val R²: {val_metrics['r2']:.4f}, Val RMSE: {val_metrics['rmse']:.2f}")
         
         return val_metrics['r2']  # Return metric for optimization
+
 '''
 def train_decision_tree(X_train, y_train, X_val, y_val, trial=None):
     """Train decision tree model with optional hyperparameter optimization."""
@@ -183,16 +184,16 @@ def main():
         for algorithm in args.algorithms:
             logger.info(f"Starting Training {algorithm}")
 
-            cpu_percent = psutil.cpu_percent(interval=1)
-            memory_percent = psutil.virtual_memory().percent
-            disk_percent = psutil.disk_usage('/').percent
+            cpu_percent = ps.cpu_percent(interval=1)
+            memory_percent = ps.virtual_memory().percent
+            disk_percent = ps.disk_usage('/').percent
 
-            mlflow.log_metric("cpu_usage: ", cpu_percent)
-            mlflow.log_metric("ram_usage:", memory_percent)
-            mlflow.log_metric("disk_percent:", disk_percent)
+            mlflow.log_metric("cpu_usage ", cpu_percent)
+            mlflow.log_metric("ram_usage ", memory_percent)
+            mlflow.log_metric("disk_percent ", disk_percent)
 
-            
-    '''       
+            print(args.optimize)
+           
             if args.optimize:
                 # Hyperparameter optimization
                 best_params, best_score = optimize_hyperparameters(
@@ -203,20 +204,15 @@ def main():
                 # Train final model with best parameters
                 if algorithm == 'linear_regression':
                     final_score = train_linear_regression(X_train, y_train, X_val, y_val)
-                elif algorithm == 'decision_tree':
-                    final_score = train_decision_tree(X_train, y_train, X_val, y_val)
-                elif algorithm == 'random_forest':
-                    final_score = train_random_forest(X_train, y_train, X_val, y_val)
-                
+                #elif algorithm == 'decision_tree':
+                #    final_score = train_decision_tree(X_train, y_train, X_val, y_val)                               
             else:
                 # Train with default parameters
                 if algorithm == 'linear_regression':
                     score = train_linear_regression(X_train, y_train, X_val, y_val)
-                elif algorithm == 'decision_tree':
-                    score = train_decision_tree(X_train, y_train, X_val, y_val)
-                elif algorithm == 'random_forest':
-                    score = train_random_forest(X_train, y_train, X_val, y_val)
-                
+                #elif algorithm == 'decision_tree':
+                #    score = train_decision_tree(X_train, y_train, X_val, y_val)
+                               
                 results[algorithm] = {'score': score}
     
     # Print results summary
@@ -230,7 +226,7 @@ def main():
             logger.info(f"  Best params: {result['best_params']}")
         else:
             logger.info(f"{algorithm}: R² = {result['score']:.4f}")
-    '''
+    
     logger.info("Training completed!")
 
 if __name__ == "__main__":
