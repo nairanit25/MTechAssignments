@@ -22,7 +22,7 @@ import psutil as ps
 # Setup logging
 logger = setup_logger(__name__, log_file="./logs/models.log")
 
-def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
+def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, trial=None):
     """Train linear regression model with optional hyperparameter optimization."""
     # Hyperparameters
     if trial:
@@ -45,7 +45,9 @@ def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
         train_metrics = model.train(X_train, y_train, regularization=regularization, alpha=alpha)
         
         # Evaluate on validation set
-        val_metrics = model.evaluate(X_val, y_val)
+        val_metrics = model.evaluate_model(X_val, y_val, type='val')
+
+        test_metrics = model.evaluate_model(X_test, y_test, type='test')
         
         # Log metrics
         for key, value in train_metrics.items():
@@ -54,6 +56,9 @@ def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
         for key, value in val_metrics.items():
             mlflow.log_metric(f'val_{key}', value)
         
+        for key, value in val_metrics.items():
+            mlflow.log_metric(f'test_{key}', value)
+
         # Log model
         mlflow.sklearn.log_model(
             model.model,
@@ -61,9 +66,9 @@ def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
             registered_model_name="housing_price_predictor"
         )
         
-        logger.info(f"Linear Regression - Val R²: {val_metrics['r2']:.4f}, Val RMSE: {val_metrics['rmse']:.2f}")
+        logger.info(f"Linear Regression - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")
         
-        return val_metrics['r2']  # Return metric for optimization
+        return val_metrics['val_r2']  # Return metric for optimization
 
 '''
 def train_decision_tree(X_train, y_train, X_val, y_val, trial=None):
@@ -198,13 +203,13 @@ def main():
                 '''
                 # Train final model with best parameters
                 if algorithm == 'linear_regression':
-                    final_score = train_linear_regression(X_train, y_train, X_val, y_val)
+                    final_score = train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test)
                 #elif algorithm == 'decision_tree':
                 #    final_score = train_decision_tree(X_train, y_train, X_val, y_val)                               
             else:
                 # Train with default parameters
                 if algorithm == 'linear_regression':
-                    score = train_linear_regression(X_train, y_train, X_val, y_val)
+                    score = train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test)
                 #elif algorithm == 'decision_tree':
                 #    score = train_decision_tree(X_train, y_train, X_val, y_val)
                                

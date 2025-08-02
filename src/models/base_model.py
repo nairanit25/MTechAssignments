@@ -37,11 +37,36 @@ class BaseModel(abc.ABC):
         """Train the model."""
         pass
     
+    '''
     @abc.abstractmethod
     def predict(self, features: Dict[str, Any]) -> float:
         """Make a prediction."""
         pass  
-     
+    '''
+    
+    @abc.abstractmethod
+    def predict(self, X: pd.DataFrame) -> np.ndarray:
+        """Make a prediction."""
+        pass
+
+    def evaluate_model(self, X_eval: pd.DataFrame, y_actual: pd.DataFrame, type='test') -> Dict[str, float]:
+        """Evaluate model performance."""
+        if not self.is_loaded:
+            raise ValueError("Model not loaded")
+        
+        y_pred = self.predict(X_eval)
+                
+        metrics = {
+            type+'_mse': mean_squared_error(y_actual, y_pred),
+            type+'_rmse': np.sqrt(mean_squared_error(y_actual, y_pred)),
+            type+'_mae': mean_absolute_error(y_actual, y_pred),
+            type+'_r2': r2_score(y_actual, y_pred),
+            type+'_mape': np.mean(np.abs((y_actual - y_pred) / y_actual)) * 100
+        }
+        
+        self.metrics.update(metrics)
+        return metrics
+
     def evaluate(self, X: pd.DataFrame, y: pd.DataFrame) -> Dict[str, float]:
         """Evaluate model performance."""
         if not self.is_loaded:
@@ -155,23 +180,3 @@ class BaseModel(abc.ABC):
     def update_config(self, config: Dict[str, Any]) -> None:
         """Update model configuration."""
         self.config.update(config)
-    
-    def get_feature_importance(self) -> Optional[Dict[str, float]]:
-        """Get feature importance if available."""
-        if hasattr(self.model, 'feature_importances_'):
-            feature_names = [
-                'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors',
-                'waterfront', 'view', 'condition', 'grade', 'sqft_above',
-                'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode',
-                'lat', 'long', 'sqft_living15', 'sqft_lot15'
-            ]
-            return dict(zip(feature_names, self.model.feature_importances_))
-        elif hasattr(self.model, 'coef_'):
-            feature_names = [
-                'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors',
-                'waterfront', 'view', 'condition', 'grade', 'sqft_above',
-                'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode',
-                'lat', 'long', 'sqft_living15', 'sqft_lot15'
-            ]
-            return dict(zip(feature_names, abs(self.model.coef_)))
-        return None

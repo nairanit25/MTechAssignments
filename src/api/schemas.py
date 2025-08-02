@@ -15,16 +15,7 @@ class CaliforniaHousing(BaseModel):
     Population: float = Field(..., ge=1, description="Block group population")
     avg_household_members: float = Field(..., ge=32.0, le=42.0, description="Average number of household members")
     Latitude: float = Field(..., description="LatBlock group latitudeitude (California range)")
-    Longitude: float = Field(..., ge=-124.0, le=-114.0, description="Block group longitude (California range)")
-      
-    '''
-    @validator('yr_renovated')
-    def validate_renovation_year(cls, v, values):
-        """Validate renovation year is after build year."""
-        if v > 0 and 'yr_built' in values and v < values['yr_built']:
-            raise ValueError('Renovation year cannot be before build year')
-        return v
-    '''
+    Longitude: float = Field(..., ge=-124.0, le=-114.0, description="Block group longitude (California range)")     
 
 class PredictionRequest(BaseModel):
     """Request schema for housing price prediction."""
