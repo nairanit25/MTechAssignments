@@ -201,6 +201,7 @@ def main():
                 # Train final model with best parameters
                 if algorithm == 'linear_regression':
                     final_score = train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test)
+                    results[algorithm]['final_score'] = final_score
                 #elif algorithm == 'decision_tree':
                 #    final_score = train_decision_tree(X_train, y_train, X_val, y_val)                               
             else:
