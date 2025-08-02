@@ -52,11 +52,11 @@ class LinearRegressionModel(BaseModel):
         
         # Calculate training metrics
         train_predictions = self.model.predict(X)
+
         training_metrics = {
-            'train_mse': mean_squared_error(y - train_predictions),
-            'train_mae': mean_absolute_error(y - train_predictions),
-            'train_rmse': np.sqrt(mean_squared_error(y - train_predictions)),    
-            'train_mape': np.mean(np.abs((y - train_predictions) / y)) * 100,       
+            'train_mse': np.mean((y - train_predictions) ** 2),
+            'train_mae': np.mean(np.abs(y - train_predictions)),
+            'train_rmse': np.sqrt(np.mean((y - train_predictions) ** 2)),            
             'train_r2': self.model.score(X, y)
         }
         
