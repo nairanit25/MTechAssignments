@@ -146,10 +146,8 @@ class BaseModel(abc.ABC):
         
         # Basic preprocessing - convert to numpy array
         feature_order = [
-            'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors',
-            'waterfront', 'view', 'condition', 'grade', 'sqft_above',
-            'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode',
-            'lat', 'long', 'sqft_living15', 'sqft_lot15'
+            'median_income', 'housing_median_age', 'avg_rooms_per_household', 'avg_num_bedrooms_per_house', 
+            'Population', 'avg_household_members', 'Latitude', 'Longitude'
         ]
         
         return df[feature_order].values

@@ -42,11 +42,7 @@ def train_linear_regression(X_train, y_train, X_val, y_val, trial=None):
         mlflow.log_param('alpha ', alpha)
         
         # Train model
-        train_metrics = model.train(
-            X_train, y_train,
-            regularization=regularization,
-            alpha=alpha
-        )
+        train_metrics = model.train(X_train, y_train, regularization=regularization, alpha=alpha)
         
         # Evaluate on validation set
         val_metrics = model.evaluate(X_val, y_val)
@@ -190,17 +186,16 @@ def main():
 
             mlflow.log_metric("cpu_usage ", cpu_percent)
             mlflow.log_metric("ram_usage ", memory_percent)
-            mlflow.log_metric("disk_percent ", disk_percent)
-
-            print(args.optimize)
+            mlflow.log_metric("disk_percent ", disk_percent)        
            
             if args.optimize:
+                '''
                 # Hyperparameter optimization
                 best_params, best_score = optimize_hyperparameters(
                     algorithm, X_train, y_train, X_val, y_val, args.n_trials
                 )
                 results[algorithm] = {'best_params': best_params, 'best_score': best_score}
-                
+                '''
                 # Train final model with best parameters
                 if algorithm == 'linear_regression':
                     final_score = train_linear_regression(X_train, y_train, X_val, y_val)
