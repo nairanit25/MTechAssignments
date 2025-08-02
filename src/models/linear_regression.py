@@ -58,10 +58,18 @@ class LinearRegressionModel(BaseModel):
             'train_r2': self.model.score(X, y)
         }
         
-        self.metrics.update(training_metrics)
-        
+        self.metrics.update(training_metrics)        
         return training_metrics
-    
+
+    def predict(self, X: pd.DataFrame) -> np.ndarray:
+        """Make a prediction using the linear regression model."""
+        if not self.is_loaded:
+            raise ValueError("Model not loaded")
+        
+        # Make prediction
+        return self.model.predict(X)
+        
+    '''
     def predict(self, features: Dict[str, Any]) -> float:
         """Make a prediction using the linear regression model."""
         if not self.is_loaded:
@@ -71,10 +79,9 @@ class LinearRegressionModel(BaseModel):
         X = self._preprocess_features(features)
         
         # Make prediction
-        prediction = self.model.predict(X)[0]
-        
+        prediction = self.model.predict(X)[0]        
         return float(prediction)
-    
+    '''
     def predict_confidence(self, features: Dict[str, Any]) -> float:
         """Calculate prediction confidence based on model certainty."""
         if not self.is_loaded:
