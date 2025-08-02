@@ -67,20 +67,8 @@ class LinearRegressionModel(BaseModel):
             raise ValueError("Model not loaded")
         
         # Make prediction
-        return self.model.predict(X)
-        
-    '''
-    def predict(self, features: Dict[str, Any]) -> float:
-        """Make a prediction using the linear regression model."""
-        if not self.is_loaded:
-            raise ValueError("Model not loaded")
-        
-        # Preprocess features
-        X = self._preprocess_features(features)
-        
-        # Make prediction
-        prediction = self.model.predict(X)[0]        
-        return float(prediction)
+        return self.model.predict(X)       
+
     '''
     def predict_confidence(self, features: Dict[str, Any]) -> float:
         """Calculate prediction confidence based on model certainty."""
@@ -99,6 +87,7 @@ class LinearRegressionModel(BaseModel):
         confidence = min(max(base_confidence * 0.9, 0.1), 0.95)
         
         return float(confidence)
+    '''
     
     def get_coefficients(self) -> Dict[str, float]:
         """Get model coefficients."""

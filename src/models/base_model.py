@@ -35,14 +35,7 @@ class BaseModel(abc.ABC):
     @abc.abstractmethod
     def train(self, X: pd.DataFrame, y: pd.DataFrame, **args) -> Dict[str, Any]:
         """Train the model."""
-        pass
-    
-    '''
-    @abc.abstractmethod
-    def predict(self, features: Dict[str, Any]) -> float:
-        """Make a prediction."""
-        pass  
-    '''
+        pass   
     
     @abc.abstractmethod
     def predict(self, X: pd.DataFrame) -> np.ndarray:
@@ -62,29 +55,6 @@ class BaseModel(abc.ABC):
             type+'_mae': mean_absolute_error(y_actual, y_pred),
             type+'_r2': r2_score(y_actual, y_pred),
             type+'_mape': np.mean(np.abs((y_actual - y_pred) / y_actual)) * 100
-        }
-        
-        self.metrics.update(metrics)
-        return metrics
-
-    def evaluate(self, X: pd.DataFrame, y: pd.DataFrame) -> Dict[str, float]:
-        """Evaluate model performance."""
-        if not self.is_loaded:
-            raise ValueError("Model not loaded")
-        
-        predictions = []
-        for _, row in X.iterrows():
-            pred = self.predict(row.to_dict())
-            predictions.append(pred)
-        
-        predictions = np.array(predictions)
-        
-        metrics = {
-            'mse': mean_squared_error(y, predictions),
-            'rmse': np.sqrt(mean_squared_error(y, predictions)),
-            'mae': mean_absolute_error(y, predictions),
-            'r2': r2_score(y, predictions),
-            'mape': np.mean(np.abs((y - predictions) / y)) * 100
         }
         
         self.metrics.update(metrics)
