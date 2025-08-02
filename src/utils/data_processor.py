@@ -19,7 +19,7 @@ class DataLoader:
         self.scaler = StandardScaler()
         self.is_fitted = False
     
-    def load_data(self, data_file_path: str) -> Tuple[pd.DataFrame, pd.Series]:
+    def load_data(self, data_file_path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """Load data from file."""
         try:
             data_path = Path(data_file_path) 
@@ -36,7 +36,7 @@ class DataLoader:
             logger.error(f"Failed to load Housing data from {data_path}: {e}")
             raise
    
-    def preprocess_data(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
+    def preprocess_data(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """Preprocess the housing data."""
         try:
             # Make a copy to avoid modifying original data
@@ -104,12 +104,9 @@ class DataLoader:
             raise
     
     def split_data(
-        self, 
-        X: pd.DataFrame, 
-        y: pd.Series, 
-        test_size: float = 0.2,
-        random_state: int = 42
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+        self, X: pd.DataFrame, y: pd.DataFrame, 
+        test_size: float = 0.2, random_state: int = 42
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """Split data into train and test sets."""
         return train_test_split(
             X, y, 

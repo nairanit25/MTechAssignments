@@ -17,7 +17,7 @@ class LinearRegressionModel(BaseModel):
         super().__init__(name, version, "linear_regression")
         self.scaler = StandardScaler()
     
-    def train(self, X: pd.DataFrame, y: pd.Series, **args) -> Dict[str, Any]:
+    def train(self, X: pd.DataFrame, y: pd.DataFrame, **args) -> Dict[str, Any]:
         """Train the linear regression model."""
         # Get configuration
         regularization = args.get('regularization', 'none')

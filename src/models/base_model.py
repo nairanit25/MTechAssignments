@@ -33,7 +33,7 @@ class BaseModel(abc.ABC):
         self.config = {}
         
     @abc.abstractmethod
-    def train(self, X: pd.DataFrame, y: pd.Series, **args) -> Dict[str, Any]:
+    def train(self, X: pd.DataFrame, y: pd.DataFrame, **args) -> Dict[str, Any]:
         """Train the model."""
         pass
     
@@ -42,7 +42,7 @@ class BaseModel(abc.ABC):
         """Make a prediction."""
         pass  
      
-    def evaluate(self, X: pd.DataFrame, y: pd.Series) -> Dict[str, float]:
+    def evaluate(self, X: pd.DataFrame, y: pd.DataFrame) -> Dict[str, float]:
         """Evaluate model performance."""
         if not self.is_loaded:
             raise ValueError("Model not loaded")
