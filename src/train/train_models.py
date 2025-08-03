@@ -9,7 +9,7 @@ from pathlib import Path
 
 import mlflow
 import mlflow.sklearn
-
+from mlflow.client import MlflowClient
 from sklearn.model_selection import train_test_split
 import optuna
 
@@ -21,6 +21,8 @@ import psutil as ps
 
 # Setup logging
 logger = setup_logger(__name__, log_file="./logs/models.log")
+
+mlflow_client = mlflow.client.MlflowClient()
 
 def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, trial=None):
     """Train linear regression model with optional hyperparameter optimization."""
@@ -35,6 +37,7 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
     # Create and train model
     model = LinearRegressionModel()
     algorithm_name = 'linear_regression'
+    
     with mlflow.start_run(nested=True):
         # Log parameters
         mlflow.log_param('algorithm ', algorithm_name)
@@ -56,13 +59,44 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
         for key, value in val_metrics.items():
             mlflow.log_metric(f'val_{key}', value)
         
-        for key, value in val_metrics.items():
+        for key, value in test_metrics.items():
             mlflow.log_metric(f'test_{key}', value)
 
         # Log model
-        mlflow.sklearn.log_model(
-            sk_model=model.model, artifact_path=algorithm_name,
-            registered_model_name="housing_price_predictor"
+        registered_model_version =  mlflow.sklearn.log_model(
+            sk_model=model.model, name= "housing_price_predictor",
+            registered_model_name= algorithm_name + "_housing_price_predictor"
+        )
+        
+        # Add a tag
+        print(f"Adding tag 'dataset'='california-housing' to model '{registered_model_version.name}' version {registered_model_version.registered_model_version}")
+
+        mlflow_client.set_model_version_tag(
+            name=registered_model_version.name,
+            version= registered_model_version.registered_model_version,
+            key="dataset", value="california-housing"
+        )
+        mlflow_client.set_model_version_tag(
+            name=registered_model_version.name,
+            version= registered_model_version.registered_model_version,
+            key="optimization_framework", value="optuna"
+        )
+        mlflow_client.set_model_version_tag(
+            name=registered_model_version.name,
+            version= registered_model_version.registered_model_version,
+            key="model_type", value="linear-regression"
+        )
+
+        mlflow_client.set_model_version_tag(
+            name=registered_model_version.name,
+            version= registered_model_version.registered_model_version,
+            key="run_id", value=registered_model_version.run_id
+        )
+
+        mlflow_client.update_model_version(
+        name= registered_model_version.name, version= registered_model_version.registered_model_version,
+        description="This is a linear regression model for the California Housing dataset. "
+                    "It was trained with the optimal hyperparameters identified by Optuna."
         )
         
         logger.info(f"Linear Regression - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")
@@ -146,6 +180,8 @@ def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, X_test, 
 
 def main():
     """Main training script."""
+    #global mlflow_client
+
     parser = argparse.ArgumentParser(description='ML models training for housing price prediction')
     parser.add_argument('--data-path', type=str, help='Path to training dataset')
     parser.add_argument('--optimize', action='store_true', help='Perform hyperparameter optimization')
@@ -161,6 +197,7 @@ def main():
     settings = Settings()
     mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI)
     mlflow.set_experiment(settings.MLFLOW_EXPERIMENT_NAME)
+    #mlflow_client = mlflow.client.MlflowClient()
     
     # Load data
     data_loader = DataLoader()
