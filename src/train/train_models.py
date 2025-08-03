@@ -9,7 +9,6 @@ from pathlib import Path
 
 import mlflow
 import mlflow.sklearn
-from mlflow.client import MlflowClient
 from sklearn.model_selection import train_test_split
 import optuna
 
@@ -68,9 +67,7 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
             registered_model_name= algorithm_name + "_housing_price_predictor"
         )
         
-        # Add a tag
-        print(f"Adding tag 'dataset'='california-housing' to model '{registered_model_version.name}' version {registered_model_version.registered_model_version}")
-
+        # Add tags
         mlflow_client.set_model_version_tag(
             name=registered_model_version.name,
             version= registered_model_version.registered_model_version,
