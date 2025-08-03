@@ -201,13 +201,13 @@ def main():
                 best_score = study.best_value
                 best_trail_number = study.best_trial.number
                 results[algorithm] = {'best_params': best_params, 'best_score': best_score, 'best_trail_number': best_trail_number}
-                with open("best_hyperparameters.txt", "w") as file:
+                with open("logs/best_hyperparameters.txt", "w") as file:
                     file.write(f"Algorithm: {algorithm}\n")
                     file.write(f"Best trial number: {best_trail_number}\n")
                     file.write(f"Best Hyperparameters: {best_params}\n")
-                    file.write(f"Best R²: {best_score}\n") 
+                    file.write(f"Best R-square: {best_score}\n") 
                     file.close
-                mlflow.log_artifact("best_hyperparameters.txt")
+                mlflow.log_artifact("logs/best_hyperparameters.txt")
 
                 # Train final model with best parameters
                 if algorithm == 'linear_regression':
