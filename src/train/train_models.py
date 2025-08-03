@@ -34,10 +34,10 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
     
     # Create and train model
     model = LinearRegressionModel()
-    
+    algorithm_name = 'linear_regression'
     with mlflow.start_run(nested=True):
         # Log parameters
-        mlflow.log_param('algorithm ', 'linear_regression')
+        mlflow.log_param('algorithm ', algorithm_name)
         mlflow.log_param('regularization ', regularization)
         mlflow.log_param('alpha ', alpha)
         
@@ -61,8 +61,7 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
 
         # Log model
         mlflow.sklearn.log_model(
-            model.model,
-            "model",
+            sk_model=model.model, artifact_path=algorithm_name,
             registered_model_name="housing_price_predictor"
         )
         
@@ -130,7 +129,7 @@ def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, X_test, 
     
     def objective(trial):
         if algorithm == 'linear_regression':
-            return train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, trial)
+            return train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, trial)        
         #elif algorithm == 'decision_tree':
         #    return train_decision_tree(X_train, y_train, X_val, y_val, trial)        
         else:
@@ -143,7 +142,7 @@ def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, X_test, 
     logger.info(f"Best parameters for {algorithm}: {study.best_params}")
     logger.info(f"Best score for {algorithm}: {study.best_value:.4f}")
     
-    return study.best_params, study.best_value
+    return study
 
 def main():
     """Main training script."""
@@ -193,15 +192,27 @@ def main():
             if args.optimize:
                  
                 # Hyperparameter optimization
-                best_params, best_score = optimize_hyperparameters(
+                
+                study = optimize_hyperparameters(
                     algorithm, X_train, y_train, X_val, y_val, X_test, y_test, args.n_trials
                 )
-                results[algorithm] = {'best_params': best_params, 'best_score': best_score}
-                 
+                
+                best_params = study.best_params
+                best_score = study.best_value
+                best_trail_number = study.best_trial.number
+                results[algorithm] = {'best_params': best_params, 'best_score': best_score, 'best_trail_number': best_trail_number}
+                with open("best_hyperparameters.txt", "w") as file:
+                    file.write(f"Algorithm: {algorithm}\n")
+                    file.write(f"Best trial number: {best_trail_number}\n")
+                    file.write(f"Best Hyperparameters: {best_params}\n")
+                    file.write(f"Best R²: {best_score}\n") 
+                    file.close
+                mlflow.log_artifact("best_hyperparameters.txt")
+
                 # Train final model with best parameters
                 if algorithm == 'linear_regression':
                     final_score = train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test)
-                    results[algorithm]['final_score'] = final_score
+                    results[algorithm]['final_score'] = final_score                   
                 #elif algorithm == 'decision_tree':
                 #    final_score = train_decision_tree(X_train, y_train, X_val, y_val)                               
             else:
@@ -212,6 +223,8 @@ def main():
                 #    score = train_decision_tree(X_train, y_train, X_val, y_val)
                                
                 results[algorithm] = {'score': score}
+
+
     
     # Print results summary
     logger.info("\n" + "="*50)
