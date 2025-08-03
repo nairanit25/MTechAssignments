@@ -10,11 +10,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware 
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
+from src.models.model_registry import ModelRegistry
 import uvicorn
  
+
+logger = setup_logger(__name__ , log_file="./logs/api.log")
+
 # Initialize components
 settings = Settings()
-logger = setup_logger(__name__ , log_file="./logs/api.log")
+model_registry = ModelRegistry()
+
 
 # Global variables for models and metrics
 models = {}
@@ -23,14 +28,21 @@ models = {}
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     logger.info("Starting MLOps Housing Price Prediction Inference App")
-    ''' 
+    
     # Load models on startup
     try:
-        # Load the best model from the MLflow Model Registry
-        client = mlflow.tracking.MlflowClient()
-        latest_version = client.get_latest_versions("linear_regression_housing_price_predictor", stages=["Production"])[0]
-        model_uri = f"models:/{latest_version.name}/{latest_version.version}"
+        # list all the models from registry
+        list_models = model_registry.list_mlflow_registered_models()
+        logger.info(f"Available models in the registry: {list_models}")
         
+        # Load the best model from the MLflow Model Registry
+        #models["main_model"] = model_registry.load_model(model_name='housing_price_predictor', model_version=6) 
+        #print(models["main_model"])
+
+        #client = mlflow.client.MlflowClient()
+        #latest_version = client.get_latest_versions("linear_regression_housing_price_predictor", stages=["Production"])[0]
+        #model_uri = f"models:/{latest_version.name}/{latest_version.version}"
+        '''
         # Load model using the appropriate flavor
         models["main_model"] = mlflow.sklearn.load_model(model_uri)
         models["main_model_info"] = {
@@ -38,11 +50,11 @@ async def lifespan(app: FastAPI):
             "version": latest_version.version,
             "uri": model_uri
         }
-        
+        '''
         logger.info("Models loaded successfully")
     except Exception as e:
         logger.error(f"Failed to load models: {e}")
-    '''
+    
     yield
     
     logger.info("Shutting down MLOps Housing Price Prediction API Server")

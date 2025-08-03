@@ -122,24 +122,6 @@ class ModelRegistry:
             logger.error(f"Error listing registered models: {str(e)}")
             return []
 
-    def get_latest_model_version(self, model_name: str):
-        try:
-            # Search for all model versions with the given name
-            model_versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
-            
-            if not model_versions:
-                print(f"No versions found for model '{model_name}'.")
-                return None
-                        
-            latest_version = max(model_versions, key=lambda mv: int(mv.version))
-            
-            print(f"Found latest version: {latest_version.version} for model '{model_name}'.")
-            return latest_version
-            
-        except Exception as e:
-            print(f"Error retrieving latest model version: {e}")
-            return None
-        
     def load_model(self, model_name, model_version="latest"):
 
         try:
@@ -149,16 +131,16 @@ class ModelRegistry:
             if not model_versions:
                 print(f"No versions found for model '{model_name}'.")
                 return None
-                        
-            latest_version = max(model_versions, key=lambda mv: int(mv.version))
-
+                   
             if model_version == "latest":
-                model_uri = f"models:/{model_name}/latest"
+                latest_version = max(model_versions, key=lambda mv: int(mv.version))
+                print(f"Found latest version: {latest_version.version} for model '{model_name}'.")
+                model_uri = f"models:/{model_name}/{latest_version}"
             else:
                 model_uri = f"models:/{model_name}/{model_version}"
             
             model = mlflow.sklearn.load_model(model_uri)
-            print(f"Found latest version: {latest_version.version} for model '{model_name}'.")
+            
             return model
             
         except Exception as e:
