@@ -180,7 +180,6 @@ def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, X_test, 
 
 def main():
     """Main training script."""
-    #global mlflow_client
 
     parser = argparse.ArgumentParser(description='ML models training for housing price prediction')
     parser.add_argument('--data-path', type=str, help='Path to training dataset')
@@ -197,7 +196,6 @@ def main():
     settings = Settings()
     mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI)
     mlflow.set_experiment(settings.MLFLOW_EXPERIMENT_NAME)
-    #mlflow_client = mlflow.client.MlflowClient()
     
     # Load data
     data_loader = DataLoader()
@@ -228,8 +226,7 @@ def main():
            
             if args.optimize:
                  
-                # Hyperparameter optimization
-                
+                # Hyperparameter optimization                
                 study = optimize_hyperparameters(
                     algorithm, X_train, y_train, X_val, y_val, X_test, y_test, args.n_trials
                 )
@@ -260,7 +257,6 @@ def main():
                 #    score = train_decision_tree(X_train, y_train, X_val, y_val)
                                
                 results[algorithm] = {'score': score}
-
 
     
     # Print results summary
