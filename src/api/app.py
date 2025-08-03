@@ -23,7 +23,7 @@ models = {}
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     logger.info("Starting MLOps Housing Price Prediction Inference App")
-    
+    ''' 
     # Load models on startup
     try:
         # Load the best model from the MLflow Model Registry
@@ -42,7 +42,7 @@ async def lifespan(app: FastAPI):
         logger.info("Models loaded successfully")
     except Exception as e:
         logger.error(f"Failed to load models: {e}")
-    
+    '''
     yield
     
     logger.info("Shutting down MLOps Housing Price Prediction API Server")
