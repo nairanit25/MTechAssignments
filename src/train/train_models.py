@@ -21,7 +21,7 @@ import psutil as ps
 # Setup logging
 logger = setup_logger(__name__, log_file="./logs/models.log")
 
-mlflow_client = mlflow.client.MlflowClient()
+mlflow_client = mlflow.client.MlflowClient() #"http://localhost:5000"
 
 def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, trial=None):
     """Train linear regression model with optional hyperparameter optimization."""
@@ -37,7 +37,7 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
     model = LinearRegressionModel()
     algorithm_name = 'linear_regression'
     
-    with mlflow.start_run(nested=True):
+    with mlflow.start_run(nested=True) as run:
         # Log parameters
         mlflow.log_param('algorithm ', algorithm_name)
         mlflow.log_param('regularization ', regularization)
@@ -53,45 +53,62 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
         
         # Log metrics
         for key, value in train_metrics.items():
-            mlflow.log_metric(f'train_{key}' if not key.startswith('train_') else key, value)
+            mlflow.log_metric(f'{key}' if not key.startswith('train_') else key, value)
         
         for key, value in val_metrics.items():
-            mlflow.log_metric(f'val_{key}', value)
+            mlflow.log_metric(f'{key}', value)
         
         for key, value in test_metrics.items():
-            mlflow.log_metric(f'test_{key}', value)
+            mlflow.log_metric(f'{key}', value)
 
-        # Log model
-        registered_model_version =  mlflow.sklearn.log_model(
-            sk_model=model.model, name= "housing_price_predictor",
-            registered_model_name= algorithm_name + "_housing_price_predictor"
-        )
-        
+        # Log model 
+        registered_model_name= algorithm_name + "_housing_price_predictor"
+        model_name = "housing_price_predictor"
+        mlflow.sklearn.log_model(sk_model=model.model, name= model_name ) 
+             
+                
+        # Register model
+        model_uri = f"runs:/{run.info.run_id}/{model_name}"
+
+        tags = {
+            "dataset": "california-housing",
+            "optimization_framework": "optuna",
+            "model_type": "linear-regression",
+            "run_id": run.info.run_id
+        }
+            
+        registered_model =  mlflow.register_model(
+            model_uri,
+            registered_model_name,
+            tags=tags
+        ) 
+        '''
         # Add tags
         mlflow_client.set_model_version_tag(
             name=registered_model_version.name,
-            version= registered_model_version.registered_model_version,
+            version= registered_model_version.version,
             key="dataset", value="california-housing"
         )
         mlflow_client.set_model_version_tag(
             name=registered_model_version.name,
-            version= registered_model_version.registered_model_version,
+            #version= registered_model_version.version,
             key="optimization_framework", value="optuna"
         )
         mlflow_client.set_model_version_tag(
             name=registered_model_version.name,
-            version= registered_model_version.registered_model_version,
+            #version= registered_model_version.registered_model_version,
             key="model_type", value="linear-regression"
         )
 
         mlflow_client.set_model_version_tag(
             name=registered_model_version.name,
-            version= registered_model_version.registered_model_version,
+            #version= registered_model_version.registered_model_version,
             key="run_id", value=registered_model_version.run_id
         )
-
+        
+        '''
         mlflow_client.update_model_version(
-        name= registered_model_version.name, version= registered_model_version.registered_model_version,
+        name= registered_model.name, version= registered_model.version,
         description="This is a linear regression model for the California Housing dataset. "
                     "It was trained with the optimal hyperparameters identified by Optuna."
         )
