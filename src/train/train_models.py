@@ -6,6 +6,7 @@ import os
 import sys 
 import argparse
 from pathlib import Path
+from datetime import datetime
 
 import mlflow
 import mlflow.sklearn
@@ -21,7 +22,7 @@ import psutil as ps
 # Setup logging
 logger = setup_logger(__name__, log_file="./logs/models.log")
 
-mlflow_client = mlflow.client.MlflowClient() #"http://localhost:5000"
+mlflow_client = mlflow.client.MlflowClient()
 
 def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, trial=None):
     """Train linear regression model with optional hyperparameter optimization."""
@@ -62,8 +63,9 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
             mlflow.log_metric(f'{key}', value)
 
         # Log model 
-        registered_model_name= algorithm_name + "_housing_price_predictor"
-        model_name = "housing_price_predictor"
+        model_name= algorithm_name + "_housing_price_predictor"
+        registered_model_name = "housing_price_predictor"
+        
         mlflow.sklearn.log_model(sk_model=model.model, name= model_name ) 
              
                 
@@ -74,45 +76,24 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
             "dataset": "california-housing",
             "optimization_framework": "optuna",
             "model_type": "linear-regression",
-            "run_id": run.info.run_id
+            "run_id": run.info.run_id,
+            "registration_date": datetime.now().isoformat(),
         }
             
         registered_model =  mlflow.register_model(
             model_uri,
-            registered_model_name,
+            registered_model_name, 
             tags=tags
         ) 
-        '''
-        # Add tags
-        mlflow_client.set_model_version_tag(
-            name=registered_model_version.name,
-            version= registered_model_version.version,
-            key="dataset", value="california-housing"
-        )
-        mlflow_client.set_model_version_tag(
-            name=registered_model_version.name,
-            #version= registered_model_version.version,
-            key="optimization_framework", value="optuna"
-        )
-        mlflow_client.set_model_version_tag(
-            name=registered_model_version.name,
-            #version= registered_model_version.registered_model_version,
-            key="model_type", value="linear-regression"
-        )
+        print(f"registered_model.name: {registered_model.name} registered_model.version: {registered_model.version}")
 
-        mlflow_client.set_model_version_tag(
-            name=registered_model_version.name,
-            #version= registered_model_version.registered_model_version,
-            key="run_id", value=registered_model_version.run_id
-        )
-        
+          
         '''
         mlflow_client.update_model_version(
-        name= registered_model.name, version= registered_model.version,
-        description="This is a linear regression model for the California Housing dataset. "
-                    "It was trained with the optimal hyperparameters identified by Optuna."
-        )
-        
+        name= registered_model_name, version= registered_model.version,
+        description='A linear regression model for the California Housing dataset, it was trained with the optimal hyperparameters identified by Optuna.'
+        )  
+        '''
         logger.info(f"Linear Regression - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")
         
         return val_metrics['val_r2']  # Return metric for optimization
