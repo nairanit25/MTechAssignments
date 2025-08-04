@@ -140,13 +140,17 @@ class BaseModel(abc.ABC):
             return self.preprocessor.transform(df)
         
         # Basic preprocessing - convert to numpy array
-        feature_order = [
-            'median_income', 'housing_median_age', 'avg_rooms_per_household', 'avg_num_bedrooms_per_house', 
-            'Population', 'avg_household_members', 'Latitude', 'Longitude'
-        ]
+        feature_order = self.get_features()
         
         return df[feature_order].values
     
     def update_config(self, config: Dict[str, Any]) -> None:
         """Update model configuration."""
         self.config.update(config)
+
+    def get_features(self):
+        features = [
+            'median_income', 'housing_median_age', 'avg_rooms_per_household', 'avg_num_bedrooms_per_house', 
+            'Population', 'avg_household_members', 'Latitude', 'Longitude'
+        ]
+        return features

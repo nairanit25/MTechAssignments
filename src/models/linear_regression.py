@@ -69,44 +69,18 @@ class LinearRegressionModel(BaseModel):
         
         # Make prediction
         return self.model.predict(X)       
-
-    '''
-    def predict_confidence(self, features: Dict[str, Any]) -> float:
-        """Calculate prediction confidence based on model certainty."""
-        if not self.is_loaded:
-            raise ValueError("Model not loaded")
-        
-        # For linear regression, we can use the R² score as a proxy for confidence
-        # In a real scenario, you might want to use prediction intervals
-        base_confidence = self.metrics.get('train_r2', 0.0)
-        
-        # Adjust confidence based on feature values (simple heuristic)
-        X = self._preprocess_features(features)
-        
-        # Calculate distance from training data mean (if available)
-        # This is a simplified confidence calculation
-        confidence = min(max(base_confidence * 0.9, 0.1), 0.95)
-        
-        return float(confidence)
-    '''
+   
     
     def get_coefficients(self) -> Dict[str, float]:
         """Get model coefficients."""
         if not self.is_loaded:
-            raise ValueError("Model not loaded")
-        
-        feature_names = [
-            'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors',
-            'waterfront', 'view', 'condition', 'grade', 'sqft_above',
-            'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode',
-            'lat', 'long', 'sqft_living15', 'sqft_lot15'
-        ]
-        
+            raise ValueError("Model not loaded")       
+                
         # Get coefficients from the pipeline
         regressor = self.model.named_steps['regressor']
         coefficients = regressor.coef_
         
-        return dict(zip(feature_names, coefficients))
+        return dict(zip(self.get_features(), coefficients))
     
     def get_intercept(self) -> float:
         """Get model intercept."""
