@@ -128,21 +128,7 @@ class BaseModel(abc.ABC):
             'created_at': self.created_at,
             'metrics': self.metrics,
             'config': self.config
-        }
-    
-    # def _preprocess_features(self, features: Dict[str, Any]) -> np.ndarray:
-    #     """Preprocess features for prediction."""
-    #     # Convert to DataFrame
-    #     df = pd.DataFrame([features])
-    #
-    #     # Apply preprocessor if available
-    #     if self.preprocessor:
-    #         return self.preprocessor.transform(df)
-    #
-    #     # Basic preprocessing - convert to numpy array
-    #     feature_order = self.get_features()
-    #
-    #     return df[feature_order].values
+        }  
 
     def _preprocess_features(self, features: Union[Dict[str, Any], np.ndarray, pd.DataFrame]) -> np.ndarray:
         """Preprocess features for prediction."""

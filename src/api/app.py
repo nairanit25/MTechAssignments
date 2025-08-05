@@ -2,7 +2,6 @@
 Main Application setup.
 """
 import time 
-import mlflow
  
 from contextlib import asynccontextmanager
 from typing import Dict
@@ -29,6 +28,7 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     logger.info("Starting MLOps Housing Price Prediction Inference App")
     
+    logger.info("Starting to load model from registry")
     load_model_for_inferencing()
 
     yield
@@ -64,17 +64,6 @@ def load_model_for_inferencing():
             } 
             logger.info(f"Model {MODEL_NAME} loaded successfully")
             logger.info(f"loaded model info : {models["main_model_info"]}")
-
-            '''
-
-            #client = mlflow.client.MlflowClient()
-            #latest_version = client.get_latest_versions("linear_regression_housing_price_predictor", stages=["Production"])[0]
-            #model_uri = f"models:/{latest_version.name}/{latest_version.version}"
-            
-            # Load model using the appropriate flavor
-            models["main_model"] = mlflow.sklearn.load_model(model_uri)
-        
-            '''
             
     except Exception as e:
         logger.error(f"Failed to load models: {e}")
