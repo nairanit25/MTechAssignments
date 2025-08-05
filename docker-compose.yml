@@ -36,14 +36,14 @@ services:
       - "5000:5000"
     volumes:
       - ./mlruns:/mlflow/mlruns
-      - ./mlflow-artifacts:/mlflow/mlflow-artifacts
+      #- ./mlflow-artifacts:/mlflow/mlflow-artifacts
     working_dir: /mlflow
     command: >
       bash -c "
         pip install Setuptools==75.6.0  mlflow==3.0.0 && \
         mlflow server --host 0.0.0.0  --port 5000 \
         --backend-store-uri sqlite:///mlflow.db  \
-        --default-artifact-root /mlflow/mlflow-artifacts \
+        --default-artifact-root /mlflow/mlruns \
         --serve-artifacts
       "
     networks:

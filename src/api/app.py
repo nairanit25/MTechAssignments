@@ -33,25 +33,41 @@ async def lifespan(app: FastAPI):
     try:
         # list all the models from registry
         list_models = model_registry.list_mlflow_registered_models()
-        logger.info(f"Available models in the registry: {list_models}")
         
-        # Load the best model from the MLflow Model Registry
-        #models["main_model"] = model_registry.load_model(model_name='housing_price_predictor', model_version=6) 
-        #print(models["main_model"])
+        if not list_models:
+            logger.info(f"No Available models found in the registry: {list_models}")
+        else:
+            logger.info(f"Available models in the registry: {list_models}")
+            #model_ver = model_registry.get_model_version(model_name='housing_price_predictor', version=6)
+            #print(f"model_ver: {model_ver}")
 
-        #client = mlflow.client.MlflowClient()
-        #latest_version = client.get_latest_versions("linear_regression_housing_price_predictor", stages=["Production"])[0]
-        #model_uri = f"models:/{latest_version.name}/{latest_version.version}"
-        '''
-        # Load model using the appropriate flavor
-        models["main_model"] = mlflow.sklearn.load_model(model_uri)
-        models["main_model_info"] = {
-            "name": latest_version.name,
-            "version": latest_version.version,
-            "uri": model_uri
-        }
-        '''
-        logger.info("Models loaded successfully")
+            latest_model_ver = model_registry.get_lastest_model(model_name='housing_price_predictor')
+            print(f"latest_model_ver: {latest_model_ver}")
+            
+            model_loaded = model_registry.load_model(model_name='housing_price_predictor', model_version=latest_model_ver.version) 
+            print(f" loading model: housing_price_predictor: {model_loaded}")
+
+            models["main_model"] = model_loaded 
+            models["main_model_info"] = {
+                "name": latest_model_ver.name,
+                "version": latest_model_ver.version,
+                "uri": "model_uri"
+            } 
+        
+            '''
+            # Load the best model from the MLflow Model Registry
+        
+            print(f"main_model_info : {models["main_model_info"]}")
+
+            #client = mlflow.client.MlflowClient()
+            #latest_version = client.get_latest_versions("linear_regression_housing_price_predictor", stages=["Production"])[0]
+            #model_uri = f"models:/{latest_version.name}/{latest_version.version}"
+            
+            # Load model using the appropriate flavor
+            models["main_model"] = mlflow.sklearn.load_model(model_uri)
+        
+            '''
+            logger.info("Models loaded successfully")
     except Exception as e:
         logger.error(f"Failed to load models: {e}")
     

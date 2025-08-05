@@ -46,7 +46,7 @@ async def predict(request: PredictionRequest):
     """
     Predicts the housing price based on input features.
     """
-    logger.info("predict called successfully")
+    logger.info("predict called successfully: Request payload {request} ")
     
     if "main_model" not in models or models["main_model"] is None:
         raise HTTPException(status_code=503, detail="Model is not loaded or available.")

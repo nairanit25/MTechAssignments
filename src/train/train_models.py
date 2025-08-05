@@ -63,10 +63,13 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
             mlflow.log_metric(f'{key}', value)
 
         # Log model 
+        artifact_path = "model"
         model_name= algorithm_name + "_housing_price_predictor"
         registered_model_name = "housing_price_predictor"
         
-        mlflow.sklearn.log_model(sk_model=model.model, name= model_name ) 
+        #mlflow.sklearn.log_model(sk_model=model.model,  name= model_name ) 
+        registered_model_version = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name ) 
+
              
                 
         # Register model
@@ -79,16 +82,27 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
             "run_id": run.info.run_id,
             "registration_date": datetime.now().isoformat(),
         }
+        '''
+
+        # Iterate through the dictionary and add each tag individually
+        for key, value in tags.items():
+            mlflow_client.set_model_version_tag(
+                name=registered_model_version.name,
+                version=registered_model_version.version,
+                key=key,
+                value=value
+        )
             
-        registered_model =  mlflow.register_model(
+       
+          
+        
+         registered_model =  mlflow.register_model(
             model_uri,
             registered_model_name, 
             tags=tags
         ) 
         print(f"registered_model.name: {registered_model.name} registered_model.version: {registered_model.version}")
 
-          
-        '''
         mlflow_client.update_model_version(
         name= registered_model_name, version= registered_model.version,
         description='A linear regression model for the California Housing dataset, it was trained with the optimal hyperparameters identified by Optuna.'
