@@ -24,11 +24,13 @@ class PredictionRequest(BaseModel):
 class PredictionResponse(BaseModel):
     """Response schema for housing price prediction."""
     prediction: float = Field(..., description="Predicted housing price")
+    current_timestamp: float = Field(default_factory=time.time, description="Prediction timestamp")
+    processing_time: float = Field(..., description="Processing time in seconds")
     #confidence: float = Field(..., ge=0, le=1, description="Prediction confidence score")
     #model_name: str = Field(..., description="Model used for prediction")
     #model_version: str = Field(..., description="Version of the model used")
-    #processing_time: float = Field(..., description="Processing time in seconds")
-    #timestamp: float = Field(default_factory=time.time, description="Prediction timestamp")
+    
+    
 
 class HealthResponse(BaseModel):
     """Response schema for health check."""

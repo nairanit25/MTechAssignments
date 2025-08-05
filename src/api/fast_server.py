@@ -46,8 +46,10 @@ async def predict(request: PredictionRequest):
     """
     Predicts the housing price based on input features.
     """
-    logger.info(f"predict called successfully: Request payload {request.features} ")
-    
+
+    start_time = time.time()
+    logger.info(f"predict called successfully: Request payload {request.features} ") 
+
     if "main_model" not in models or models["main_model"] is None:
         raise HTTPException(status_code=503, detail="Model is not loaded or available.")
 
@@ -69,7 +71,16 @@ async def predict(request: PredictionRequest):
         
         logger.info(f"predict Response: {prediction}")
 
-        return PredictionResponse(prediction=prediction)
+        # Total request execution time
+        execution_time = time.time() - start_time
+
+        response = PredictionResponse(
+            prediction=float(prediction), 
+            processing_time=execution_time,
+            timestamp=time.time()
+        )
+
+        return response
 
     except Exception as e:
         logger.error(f"Prediction failed: {e}")
