@@ -20,7 +20,6 @@ class CaliforniaHousing(BaseModel):
 class PredictionRequest(BaseModel):
     """Request schema for housing price prediction."""
     features: CaliforniaHousing = Field(..., description="Housing features for prediction")
-    model_preference: Optional[str] = Field(None, description="Preferred model name")
     
 class PredictionResponse(BaseModel):
     """Response schema for housing price prediction."""

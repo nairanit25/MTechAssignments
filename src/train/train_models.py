@@ -101,7 +101,7 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
             registered_model_name, 
             tags=tags
         ) 
-        print(f"registered_model.name: {registered_model.name} registered_model.version: {registered_model.version}")
+        logger.info(f"registered_model.name: {registered_model.name} registered_model.version: {registered_model.version}")
 
         mlflow_client.update_model_version(
         name= registered_model_name, version= registered_model.version,
