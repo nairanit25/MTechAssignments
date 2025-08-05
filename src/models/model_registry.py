@@ -9,8 +9,9 @@ from pathlib import Path
 import mlflow
 from mlflow.client import MlflowClient
 
-from src.models.linear_regression import LinearRegressionModel 
-  
+from src.models.linear_regression import LinearRegressionModel
+from src.models.decision_tree import DecisionTreeModel
+
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
 
@@ -31,64 +32,9 @@ class ModelRegistry:
         
         # Model classes mapping
         self.model_classes = {
-            'linear_regression': LinearRegressionModel
+            'linear_regression': LinearRegressionModel,
+            'decision_tree': DecisionTreeModel
         }
-
-    def load_models(self) -> None:
-         self._load_best_model_from_mlflow()
-
-    def _load_best_model_from_mlflow(self) -> None:
-        """Load the best model from MLflow registry."""
-        try:
-            registered_models = self.mlflow_client.search_registered_models()
-
-            if not registered_models:
-                logger.info("No registered models found.")
-                return
- 
-
-            # Get the latest version by querying the model versions directly.
-            model_versions = self.mlflow_client.search_model_versions(f"name='housing_price_predictor'")
-
-            # Sort the versions to find the one with the highest version number.
-            latest_version = max(model_versions, key=lambda mv: mv.version)
-            model_uri = f"models:/{latest_version.name}/{latest_version.version}"
-            logger.info(f"Loading latest version: {latest_version.version} from model_uri {model_uri}")
-
-            '''
-            # Get the latest version of the best model
-            latest_versions = self.mlflow_client.get_latest_versions(
-                name="housing_price_predictor", stages=None
-            )
-            logger.info(latest_versions)
-            
-            if latest_versions:
-                # Use the production model if available, otherwise staging
-                best_version = None
-                for version in latest_versions:
-                    if version.current_stage == "Production":
-                        best_version = version
-                        break
-                    elif version.current_stage == "Staging" and not best_version:
-                        best_version = version
-                
-                if best_version:
-                    # Load model from MLflow
-                    model_uri = f"models:/housing_price_predictor/{best_version.version}"
-                    sklearn_model = mlflow.sklearn.load_model(model_uri)
-                    
-                    # Create wrapper model
-                    wrapper_model = MLflowModelWrapper(
-                        name="best",
-                        sklearn_model=sklearn_model,
-                        version=best_version.version
-                    )
-                    
-                    self.models["best"] = wrapper_model
-                    logger.info(f"Loaded best model from MLflow: v{best_version.version}")
-            '''
-        except Exception as e:
-            logger.warning(f"Could not load model from MLflow: {e}")
     
     def list_mlflow_registered_models(self, max_results=100):
         """List all MLFlow registered models."""

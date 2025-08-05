@@ -65,16 +65,10 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
 
         # Log model 
         artifact_path = "model"
-        model_name= algorithm_name + "_housing_price_predictor"
         registered_model_name = "housing_price_predictor"
         
         #mlflow.sklearn.log_model(sk_model=model.model,  name= model_name )
         registered_model_version = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name )
-
-             
-                
-        # Register model
-        model_uri = f"runs:/{run.info.run_id}/{model_name}"
 
         tags = {
             "dataset": "california-housing",
@@ -84,7 +78,9 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
             "registration_date": datetime.now().isoformat(),
         }
         '''
-
+        # Register model
+        model_uri = f"runs:/{run.info.run_id}/{model_name}"
+        model_name= algorithm_name + "_housing_price_predictor"
         # Iterate through the dictionary and add each tag individually
         for key, value in tags.items():
             mlflow_client.set_model_version_tag(
@@ -159,12 +155,17 @@ def train_decision_tree(X_train, y_train, X_val, y_val, X_test, y_test, trial=No
         for key, value in test_metrics.items():
             mlflow.log_metric(f'{key}', value)
 
-        # Log model
-        mlflow.sklearn.log_model(
-            model.model,
-            "model",
-            registered_model_name="housing_price_predictor"
-        )
+        # # Log model
+        # mlflow.sklearn.log_model(
+        #     model.model,
+        #     "model",
+        #     registered_model_name="housing_price_predictor"
+        # )
+
+        artifact_path = "model"
+        registered_model_name = "housing_price_predictor"
+
+        registered_model_version = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name )
 
         logger.info(f"Decision Tree - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")
         
