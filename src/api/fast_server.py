@@ -46,16 +46,29 @@ async def predict(request: PredictionRequest):
     """
     Predicts the housing price based on input features.
     """
-    logger.info(f"predict called successfully: Request payload {request} ")
+    logger.info(f"predict called successfully: Request payload {request.features} ")
     
     if "main_model" not in models or models["main_model"] is None:
         raise HTTPException(status_code=503, detail="Model is not loaded or available.")
 
     try:
+        features_list = [
+            request.features.median_income,
+            request.features.housing_median_age,
+            request.features.avg_rooms_per_household,
+            request.features.avg_num_bedrooms_per_house,
+            request.features.Population,
+            request.features.avg_household_members,
+            request.features.Latitude,
+            request.features.Longitude
+        ]
+
         # Convert request data to a numpy array for the model
-        features = np.array(request.features).reshape(1, -1)
+        features = np.array(features_list).reshape(1, -1)
         prediction = models["main_model"].predict(features)[0]
         
+        logger.info(f"predict Response: {prediction}")
+
         return PredictionResponse(prediction=prediction)
 
     except Exception as e:
