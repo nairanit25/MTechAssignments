@@ -14,6 +14,7 @@ from sklearn.model_selection import train_test_split
 import optuna
 
 from src.models.linear_regression import LinearRegressionModel
+from src.models.decision_tree import DecisionTreeModel
 from src.utils.data_processor import DataLoader
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
@@ -67,8 +68,8 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
         model_name= algorithm_name + "_housing_price_predictor"
         registered_model_name = "housing_price_predictor"
         
-        #mlflow.sklearn.log_model(sk_model=model.model,  name= model_name ) 
-        registered_model_version = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name ) 
+        #mlflow.sklearn.log_model(sk_model=model.model,  name= model_name )
+        registered_model_version = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name )
 
              
                 
@@ -112,8 +113,8 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
         
         return val_metrics['val_r2']  # Return metric for optimization
 
-'''
-def train_decision_tree(X_train, y_train, X_val, y_val, trial=None):
+
+def train_decision_tree(X_train, y_train, X_val, y_val, X_test, y_test, trial=None):
     """Train decision tree model with optional hyperparameter optimization."""
     # Hyperparameters
     if trial:
@@ -127,7 +128,7 @@ def train_decision_tree(X_train, y_train, X_val, y_val, trial=None):
     
     # Create and train model
     model = DecisionTreeModel()
-    
+
     with mlflow.start_run(nested=True):
         # Log parameters
         mlflow.log_param('algorithm', 'decision_tree')
@@ -145,7 +146,8 @@ def train_decision_tree(X_train, y_train, X_val, y_val, trial=None):
         )
         
         # Evaluate on validation set
-        val_metrics = model.evaluate(X_val, y_val)
+        val_metrics = model.evaluate_model(X_val, y_val, type='val')
+        test_metrics = model.evaluate_model(X_test, y_test, type='test')
         
         # Log metrics
         for key, value in train_metrics.items():
@@ -153,18 +155,21 @@ def train_decision_tree(X_train, y_train, X_val, y_val, trial=None):
         
         for key, value in val_metrics.items():
             mlflow.log_metric(f'val_{key}', value)
-        
+
+        for key, value in test_metrics.items():
+            mlflow.log_metric(f'{key}', value)
+
         # Log model
         mlflow.sklearn.log_model(
             model.model,
             "model",
             registered_model_name="housing_price_predictor"
         )
+
+        logger.info(f"Decision Tree - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")
         
-        logger.info(f"Decision Tree - Val R²: {val_metrics['r2']:.4f}, Val RMSE: {val_metrics['rmse']:.2f}")
-        
-        return val_metrics['r2']
-'''
+        return val_metrics['val_r2']
+
 
 def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, X_test, y_test, n_trials=100):
     """Optimize hyperparameters using Optuna."""
@@ -173,8 +178,8 @@ def optimize_hyperparameters(algorithm, X_train, y_train, X_val, y_val, X_test, 
     def objective(trial):
         if algorithm == 'linear_regression':
             return train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, trial)        
-        #elif algorithm == 'decision_tree':
-        #    return train_decision_tree(X_train, y_train, X_val, y_val, trial)        
+        elif algorithm == 'decision_tree':
+            return train_decision_tree(X_train, y_train, X_val, y_val, X_test, y_test, trial)
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
     
@@ -256,14 +261,14 @@ def main():
                 if algorithm == 'linear_regression':
                     final_score = train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test)
                     results[algorithm]['final_score'] = final_score                   
-                #elif algorithm == 'decision_tree':
-                #    final_score = train_decision_tree(X_train, y_train, X_val, y_val)                               
+                elif algorithm == 'decision_tree':
+                    final_score = train_decision_tree(X_train, y_train, X_val, y_val,X_test, y_test)
             else:
                 # Train with default parameters
                 if algorithm == 'linear_regression':
                     score = train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test)
-                #elif algorithm == 'decision_tree':
-                #    score = train_decision_tree(X_train, y_train, X_val, y_val)
+                elif algorithm == 'decision_tree':
+                    score = train_decision_tree(X_train, y_train, X_val, y_val,X_test, y_test)
                                
                 results[algorithm] = {'score': score}
 

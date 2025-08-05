@@ -6,7 +6,7 @@ import abc
 import time
 import joblib
 import json
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Union, Optional, List
 from pathlib import Path
 
 import numpy as np
@@ -130,20 +130,50 @@ class BaseModel(abc.ABC):
             'config': self.config
         }
     
-    def _preprocess_features(self, features: Dict[str, Any]) -> np.ndarray:
+    # def _preprocess_features(self, features: Dict[str, Any]) -> np.ndarray:
+    #     """Preprocess features for prediction."""
+    #     # Convert to DataFrame
+    #     df = pd.DataFrame([features])
+    #
+    #     # Apply preprocessor if available
+    #     if self.preprocessor:
+    #         return self.preprocessor.transform(df)
+    #
+    #     # Basic preprocessing - convert to numpy array
+    #     feature_order = self.get_features()
+    #
+    #     return df[feature_order].values
+
+    def _preprocess_features(self, features: Union[Dict[str, Any], np.ndarray, pd.DataFrame]) -> np.ndarray:
         """Preprocess features for prediction."""
-        # Convert to DataFrame
-        df = pd.DataFrame([features])
-        
+
+        if isinstance(features, pd.DataFrame):
+            df = features
+
+        elif isinstance(features, dict):
+            df = pd.DataFrame([features])
+
+        elif isinstance(features, np.ndarray):
+            if features.ndim == 2:
+                df = pd.DataFrame(features)
+            elif features.ndim == 3 and features.shape[0] == 1:
+                df = pd.DataFrame(features[0])
+            else:
+                raise ValueError(f"Unsupported ndarray shape: {features.shape}")
+
+        else:
+            raise TypeError(f"Unsupported input type: {type(features)}")
+
         # Apply preprocessor if available
         if self.preprocessor:
             return self.preprocessor.transform(df)
-        
-        # Basic preprocessing - convert to numpy array
+
+        # Basic fallback preprocessing
         feature_order = self.get_features()
-        
         return df[feature_order].values
-    
+
+
+
     def update_config(self, config: Dict[str, Any]) -> None:
         """Update model configuration."""
         self.config.update(config)
