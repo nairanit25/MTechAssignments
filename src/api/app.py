@@ -29,8 +29,16 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     logger.info("Starting MLOps Housing Price Prediction Inference App")
     
-    # Load models on startup
+    load_model_for_inferencing()
+
+    yield
+    
+    logger.info("Shutting down MLOps Housing Price Prediction API Server")
+
+def load_model_for_inferencing():
+    # Load models on app startup
     try:
+        MODEL_NAME = 'housing_price_predictor'
         # list all the models from registry
         list_models = model_registry.list_mlflow_registered_models()
         
@@ -39,13 +47,14 @@ async def lifespan(app: FastAPI):
         else:
             logger.info(f"Available models in the registry: {list_models}")
             #model_ver = model_registry.get_model_version(model_name='housing_price_predictor', version=6)
-            #print(f"model_ver: {model_ver}")
+            #logger.info(f"model_ver: {model_ver}")
 
-            latest_model_ver = model_registry.get_lastest_model(model_name='housing_price_predictor')
-            print(f"latest_model_ver: {latest_model_ver}")
+            # Load the best model from the MLflow Model Registry
+            latest_model_ver = model_registry.get_lastest_model(model_name=MODEL_NAME)
+            logger.info(f"latest model version available in registry: {latest_model_ver}")
             
-            model_loaded = model_registry.load_model(model_name='housing_price_predictor', model_version=latest_model_ver.version) 
-            print(f" loading model: housing_price_predictor: {model_loaded}")
+            model_loaded = model_registry.load_model(model_name=MODEL_NAME, model_version=latest_model_ver.version) 
+            logger.info(f" loading model: {MODEL_NAME} from registry: {model_loaded}")
 
             models["main_model"] = model_loaded 
             models["main_model_info"] = {
@@ -53,11 +62,10 @@ async def lifespan(app: FastAPI):
                 "version": latest_model_ver.version,
                 "uri": "model_uri"
             } 
-        
+            logger.info(f"Model {MODEL_NAME} loaded successfully")
+            logger.info(f"loaded model info : {models["main_model_info"]}")
+
             '''
-            # Load the best model from the MLflow Model Registry
-        
-            print(f"main_model_info : {models["main_model_info"]}")
 
             #client = mlflow.client.MlflowClient()
             #latest_version = client.get_latest_versions("linear_regression_housing_price_predictor", stages=["Production"])[0]
@@ -67,13 +75,10 @@ async def lifespan(app: FastAPI):
             models["main_model"] = mlflow.sklearn.load_model(model_uri)
         
             '''
-            logger.info("Models loaded successfully")
+            
     except Exception as e:
         logger.error(f"Failed to load models: {e}")
-    
-    yield
-    
-    logger.info("Shutting down MLOps Housing Price Prediction API Server")
+
 
 # Create FastAPI application
 app = FastAPI(  

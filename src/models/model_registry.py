@@ -43,7 +43,7 @@ class ModelRegistry:
             registered_models = self.mlflow_client.search_registered_models()
 
             if not registered_models:
-                print("No registered models found.")
+                logger.info("No registered models found.")
                 return
  
 
@@ -53,14 +53,14 @@ class ModelRegistry:
             # Sort the versions to find the one with the highest version number.
             latest_version = max(model_versions, key=lambda mv: mv.version)
             model_uri = f"models:/{latest_version.name}/{latest_version.version}"
-            print(f"Loading latest version: {latest_version.version} from model_uri {model_uri}")
+            logger.info(f"Loading latest version: {latest_version.version} from model_uri {model_uri}")
 
             '''
             # Get the latest version of the best model
             latest_versions = self.mlflow_client.get_latest_versions(
                 name="housing_price_predictor", stages=None
             )
-            print(latest_versions)
+            logger.info(latest_versions)
             
             if latest_versions:
                 # Use the production model if available, otherwise staging
@@ -95,7 +95,7 @@ class ModelRegistry:
         try:
             models = self.mlflow_client.search_registered_models(max_results=max_results)
             if not models:
-                print("No registered models found.")
+                logger.info("No registered models found.")
                 return []
             
             return [
@@ -125,11 +125,11 @@ class ModelRegistry:
     def get_model_version(self, model_name: str, version: int):
         try:
             model_version = self.mlflow_client.get_model_version(name=model_name, version=version)
-            print(f"Successfully retrieved details for model '{model_name}' version {version}.")
+            logger.info(f"Successfully retrieved details for model '{model_name}' version {version}.")
             return model_version
             
         except Exception as e:
-            print(f"Error retrieving model version: {e}")
+            logger.error(f"Error retrieving model version: {e}")
             return None
         
     def get_lastest_model(self, model_name: str):
@@ -137,16 +137,16 @@ class ModelRegistry:
             model_versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
             
             if not model_versions:
-                print(f"No versions found for model '{model_name}'.")
+                logger.info(f"No versions found for model '{model_name}'.")
                 return None
 
             latest_version = max(model_versions, key=lambda mv: int(mv.version))
-            print(f"Found latest_version.name = {latest_version.name} : latest version: {latest_version.version} for model '{model_name}'.")
+            logger.info(f"Found latest_version name = {latest_version.name} : latest version: {latest_version.version} for model '{model_name}'.")
            
             return latest_version
             
         except Exception as e:
-            print(f"Error retrieving model version: {e}")
+            logger.error(f"Error retrieving model version: {e}")
             return None
    
 
@@ -157,22 +157,23 @@ class ModelRegistry:
             model_versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
             
             if not model_versions:
-                print(f"No versions found for model '{model_name}'.")
+                logger.info(f"No versions found for model '{model_name}'.")
                 return None
                    
             if model_version is None:
                 latest_version = max(model_versions, key=lambda mv: int(mv.version))
-                print(f"Found latest_version.name = {latest_version.name} : latest version: {latest_version.version} for model '{model_name}'.")
+                logger.info(f"Found latest_version.name = {latest_version.name} : latest version: {latest_version.version} for model '{model_name}'.")
                 model_uri = f"models:/{latest_version.name}/{latest_version.version}"
             else:
                 spec_model_ver = self.get_model_version(model_name, model_version)
                 model_uri = f"models:/{spec_model_ver.name}/{model_version}"
             
-            print(f"model_uri : {model_uri}")
+                logger.info(f"model_uri : {model_uri}")
+
             model = mlflow.sklearn.load_model(model_uri)
             
             return model
             
         except Exception as e:
-            print(f"Error loading model: {e}")
+            logger.error(f"Error loading model: {e}")
             return None

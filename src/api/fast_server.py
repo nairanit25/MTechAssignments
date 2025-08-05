@@ -30,7 +30,7 @@ async def health_check():
         return HealthResponse(
             status=status,
             timestamp=time.time(),
-            models_loaded= 1, #len([k for k, v in models_status.items() if v]),
+            models_loaded= len([k for k, v in models_status.items() if v]),
             system_metrics={
                 "cpu_percent": cpu_percent,
                 "memory_percent": memory_percent,
@@ -46,7 +46,7 @@ async def predict(request: PredictionRequest):
     """
     Predicts the housing price based on input features.
     """
-    logger.info("predict called successfully: Request payload {request} ")
+    logger.info(f"predict called successfully: Request payload {request} ")
     
     if "main_model" not in models or models["main_model"] is None:
         raise HTTPException(status_code=503, detail="Model is not loaded or available.")
