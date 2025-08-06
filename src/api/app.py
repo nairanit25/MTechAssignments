@@ -49,9 +49,7 @@ def load_model_for_inferencing():
             logger.info(f"No Available models found in the registry: {list_models}")
         else:
             logger.info(f"Available models in the registry: {list_models}")
-            #model_ver = model_registry.get_model_version(model_name='housing_price_predictor', version=6)
-            #logger.info(f"model_ver: {model_ver}")
-
+            
             # Load the best model from the MLflow Model Registry
             latest_model_ver = model_registry.get_lastest_model(model_name=MODEL_NAME)
             logger.info(f"latest model version available in registry: {latest_model_ver}")
