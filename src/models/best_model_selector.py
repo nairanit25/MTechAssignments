@@ -105,7 +105,7 @@ def register_best_model(best_model_data: Dict[str, Any], target_model_name):
 
 if __name__ == "__main__":
     MODEL_NAME = 'housing_price_predictor'
-    best_lr_model_data = find_top_regression_model_algorithm(MODEL_NAME, no_recent_versions_to_consider=20)
+    best_lr_model_data = find_top_regression_model_algorithm('linear_regression_housing_price_predictor', no_recent_versions_to_consider=20)
     best_dt_model_data = None
 
     best_model_data = fetch_best_model_info(best_lr_model_data, best_dt_model_data)

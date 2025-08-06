@@ -65,7 +65,7 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
 
         # Log model 
         artifact_path = "model"
-        registered_model_name = "housing_price_predictor"
+        registered_model_name = f"{algorithm_name}_housing_price_predictor"
        
         model_registered = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name )      
 
@@ -121,6 +121,7 @@ def train_decision_tree(X_train, y_train, X_val, y_val, X_test, y_test, trial=No
     
     # Create and train model
     model = DecisionTreeModel()
+    algorithm_name = 'decision_tree'
 
     with mlflow.start_run(nested=True):
         # Log parameters
@@ -160,7 +161,7 @@ def train_decision_tree(X_train, y_train, X_val, y_val, X_test, y_test, trial=No
         # )
 
         artifact_path = "model"
-        registered_model_name = "housing_price_predictor"
+        registered_model_name = f"{algorithm_name}_housing_price_predictor"
 
         registered_model_version = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name )
 
