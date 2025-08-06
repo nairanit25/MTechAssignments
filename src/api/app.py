@@ -5,11 +5,14 @@ import time
  
 from contextlib import asynccontextmanager
 from typing import Dict
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware 
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
 from src.models.model_registry import ModelRegistry
+from src.api.metrics_registry import prediction_counter, prediction_latency
+from prometheus_client import make_asgi_app
+
 import uvicorn
  
 
@@ -103,6 +106,13 @@ async def metrics_middleware(request, call_next):
     
     return response
 
+@app.middleware("http")
+async def prometheus_middleware(request: Request, call_next):
+    prediction_counter.inc()
+    with prediction_latency.time():
+        response = await call_next(request)
+    return response
+
 # Root endpoint
 @app.get("/", response_model=Dict[str, str])
 async def root():
@@ -113,6 +123,8 @@ async def root():
         "status": "healthy",
         "docs": "/docs"
     }
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
 
 from . import fast_server
 if __name__ == "__main__":
