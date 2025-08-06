@@ -206,6 +206,8 @@ def main():
                        help='Select an algorithms to train the model')
     
     args = parser.parse_args()
+
+    logger.info(f"Starting Training parameters data-path: {args.data_path},  trails: {args.n_trails}, algorithms: {args.algorithm}")
     
     # Setup
     settings = Settings()
@@ -229,7 +231,7 @@ def main():
     
     with mlflow.start_run(run_name="model_comparison"):
         for algorithm in args.algorithms:
-            logger.info(f"Starting Training {algorithm}")
+            logger.info(f"Starting Training, Algo to train: {algorithm}")
 
             cpu_percent = ps.cpu_percent(interval=1)
             memory_percent = ps.virtual_memory().percent
@@ -256,6 +258,7 @@ def main():
                     file.write(f"Best Hyperparameters: {best_params}\n")
                     file.write(f"Best R-square: {best_score}\n") 
                     file.close
+                    
                 mlflow.log_artifact("logs/best_hyperparameters.txt")
 
                 # Train final model with best parameters
