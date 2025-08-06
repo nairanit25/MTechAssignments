@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     
     # MLflow Configuration
     MLFLOW_TRACKING_URI: str = "http://localhost:5000"
-    MLFLOW_EXPERIMENT_NAME: str = "housing_price_prediction"
+    MLFLOW_EXPERIMENT_NAME: str = "housing_price_prediction_training"
     
     # Model Storage
     MODELS_DIR: str = "./models"

@@ -12,7 +12,7 @@ from src.models.decision_tree import DecisionTreeModel
 
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
-
+from datetime import datetime
 
 # Setup logging
 logger = setup_logger(__name__, log_file="./logs/models.log")
@@ -163,4 +163,50 @@ class ModelRegistry:
                 logger.error(f"Error fetching model details: {e}")
                 return recent_models_info
     
-    
+
+    def register_model(self, target_model_name, ml_model_to_be_registered, model_data: Dict[str, Any]):
+        artifact_path = "model"
+        registered_target_model_name = target_model_name
+        mlflow.set_experiment("MLOps_Housing_Price_Prediction_Best_Model_Registration_Experiment")
+
+        with mlflow.start_run(run_name=f"Registering_{registered_target_model_name}") as run:
+            logger.info(f"Logging and registering model under new name '{registered_target_model_name}'...")
+        
+            try:
+                # Log the model and register it under the new name 
+                model_registered = mlflow.sklearn.log_model(
+                    sk_model=ml_model_to_be_registered,
+                    artifact_path=artifact_path,
+                    registered_model_name=registered_target_model_name,
+                )
+
+                logger.info(f"Registered Model Name: {registered_target_model_name}, Experiment Run Info (model-run-id): {model_registered.run_id}")
+                logger.info(f"Registered Model version: {model_registered.registered_model_version}, model_uri Info: {model_registered.model_uri}") 
+                logger.info(f"Registered Model Param: {model_registered.params}")
+
+                tags = {
+                    "dataset": "california-housing",
+                    "optimization_framework": "optuna",
+                    "best_model_type": model_data.get("model_name"),
+                    "run_id": run.info.run_id,
+                    "registration_date": datetime.now().isoformat(),
+                }
+
+                 # Iterate through the dictionary and add each tag individually
+                for key, value in tags.items():
+                    self.mlflow_client.set_model_version_tag(
+                        name=registered_target_model_name,
+                        version=model_registered.registered_model_version,
+                        key=key,
+                        value=value
+                )
+
+            except Exception as e:
+                logger.error(f"Error registering model with new name '{registered_target_model_name}': {e}")
+                return None
+        
+       
+        
+        
+
+        

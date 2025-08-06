@@ -2,8 +2,7 @@
 from typing import Dict, Optional, Any, List 
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
-from src.models.model_registry import ModelRegistry
- 
+from src.models.model_registry import ModelRegistry 
  
 
 logger = setup_logger(__name__ , log_file="./logs/model.log")
@@ -11,7 +10,6 @@ logger = setup_logger(__name__ , log_file="./logs/model.log")
 # Initialize components
 settings = Settings()
 model_registry = ModelRegistry()
-
 
 def find_top_regression_model_algorithm(model_name, no_recent_versions_to_consider: int = 20) -> Dict[str, Any]:     
 
@@ -86,8 +84,24 @@ def fetch_best_model_info(lr_best_model: Dict[str, Any], dt_best_model: Dict[str
             else:
                 return lr_best_model
 
-def register_best_model(best_model_data: Dict[str, Any],):
-    logger.info("Best model to be registered in registry: {best_model}")
+def register_best_model(best_model_data: Dict[str, Any], target_model_name):
+    logger.info("Best model to be registered in registry: {best_model_data}")
+
+    if best_model_data is None:
+        raise ValueError("No Model to register, no input best model data is null or empty")
+    
+    curr_model_name = best_model_data.get('model_name')
+    curr_model_ver = best_model_data.get('model_version')
+
+     # Load the best model from the MLflow Model Registry
+    model_loaded = model_registry.load_model(model_name=curr_model_name, model_version=curr_model_ver)  
+    logger.info(f" loading model: {curr_model_name} from registry: {model_loaded}")
+    
+    logger.info(f" Registing best model as target: {target_model_name}")
+    model_registry.register_model(target_model_name, ml_model_to_be_registered = model_loaded, model_data = best_model_data)
+    logger.info(f" Registered best model with target: {target_model_name}")
+
+
 
 if __name__ == "__main__":
     MODEL_NAME = 'housing_price_predictor'
@@ -95,4 +109,4 @@ if __name__ == "__main__":
     best_dt_model_data = None
 
     best_model_data = fetch_best_model_info(best_lr_model_data, best_dt_model_data)
-    register_best_model(best_model_data)
+    register_best_model(best_model_data, MODEL_NAME)
