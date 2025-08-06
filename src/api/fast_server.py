@@ -38,8 +38,8 @@ async def health_check():
             }
         )
     except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        raise HTTPException(status_code=500, detail="Health check failed")
+        logger.error(f"Inference API Server Health check failed: {e}")
+        raise HTTPException(status_code=500, detail="Inference API Server Health check failed")
 
 @router.post("/predict", response_model=PredictionResponse)
 async def predict(request: PredictionRequest):
@@ -50,6 +50,11 @@ async def predict(request: PredictionRequest):
     start_time = time.time()
     logger.info(f"predict called successfully: Request payload {request.features} ") 
 
+    if "main_model" not in models or models["main_model"] is None:
+        logger.info("No model found for inferencing, retrying once again to download model again from registry ")
+        app.load_model_for_inferencing()
+        raise HTTPException(status_code=503, detail="Model is not loaded or available.")
+    
     if "main_model" not in models or models["main_model"] is None:
         raise HTTPException(status_code=503, detail="Model is not loaded or available.")
 

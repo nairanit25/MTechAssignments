@@ -56,7 +56,6 @@ def setup_logger(
 
 
 # Create application loggers
-app_logger = setup_logger("mlops.app", log_file="./logs/app.log")
 api_logger = setup_logger("mlops.api", log_file="./logs/api.log")
 model_logger = setup_logger("mlops.models", log_file="./logs/models.log")
 metrics_logger = setup_logger("mlops.metrics", log_file="./logs/metrics.log")
