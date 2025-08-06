@@ -66,10 +66,17 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
         # Log model 
         artifact_path = "model"
         registered_model_name = "housing_price_predictor"
-        
-        #mlflow.sklearn.log_model(sk_model=model.model,  name= model_name )
-        registered_model_version = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name )
+       
+        model_registered = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name )      
 
+        logger.info(f"Type of model_registered: {type(model_registered)}")
+        # Expected output: <class 'mlflow.entities.model_registry.ModelVersion'>
+
+        logger.info(f"Registered Model Name: {registered_model_name}, Experiment Run Info (model-run-id): {model_registered.run_id}")
+        logger.info(f"Registered Model version: {model_registered.registered_model_version}, model_uri Info: {model_registered.model_uri}")
+        logger.info(f"MLFlow Experiment run.info.run_id : {run.info.run_id}")
+        logger.info(f"Registered Model Metadata: {model_registered.metadata},  Registered Model Param: {model_registered.params}")
+        
         tags = {
             "dataset": "california-housing",
             "optimization_framework": "optuna",
@@ -77,36 +84,26 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
             "run_id": run.info.run_id,
             "registration_date": datetime.now().isoformat(),
         }
-        '''
-        # Register model
-        model_uri = f"runs:/{run.info.run_id}/{model_name}"
-        model_name= algorithm_name + "_housing_price_predictor"
-        # Iterate through the dictionary and add each tag individually
+
+         # Iterate through the dictionary and add each tag individually
         for key, value in tags.items():
             mlflow_client.set_model_version_tag(
-                name=registered_model_version.name,
-                version=registered_model_version.version,
+                name=registered_model_name,
+                version=model_registered.registered_model_version,
                 key=key,
                 value=value
         )
             
-       
-          
+        '''
+        # Update model  description
         
-         registered_model =  mlflow.register_model(
-            model_uri,
-            registered_model_name, 
-            tags=tags
-        ) 
-        logger.info(f"registered_model.name: {registered_model.name} registered_model.version: {registered_model.version}")
-
         mlflow_client.update_model_version(
         name= registered_model_name, version= registered_model.version,
         description='A linear regression model for the California Housing dataset, it was trained with the optimal hyperparameters identified by Optuna.'
         )  
         '''
-        logger.info(f"Linear Regression - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")
-        
+
+        logger.info(f"Linear Regression - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")        
         return val_metrics['val_r2']  # Return metric for optimization
 
 
@@ -207,7 +204,7 @@ def main():
     
     args = parser.parse_args()
 
-    logger.info(f"Starting Training parameters data-path: {args.data_path},  trails: {args.n_trails}, algorithms: {args.algorithm}")
+    logger.info(f"Starting Training parameters data-path: {args.data_path},  trails: {args.n_trials}, algorithms: {args.algorithms}")
     
     # Setup
     settings = Settings()
@@ -258,7 +255,7 @@ def main():
                     file.write(f"Best Hyperparameters: {best_params}\n")
                     file.write(f"Best R-square: {best_score}\n") 
                     file.close
-                    
+
                 mlflow.log_artifact("logs/best_hyperparameters.txt")
 
                 # Train final model with best parameters

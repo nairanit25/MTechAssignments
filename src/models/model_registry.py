@@ -1,8 +1,6 @@
 
 
 import os
-import time
-import logging
 from typing import Dict, Optional, Any, List
 from pathlib import Path
 
@@ -123,3 +121,46 @@ class ModelRegistry:
         except Exception as e:
             logger.error(f"Error loading model: {e}")
             return None
+
+    def  get_model_info_by_model_metrics(self, model_name, no_recent_versions_to_consider: int = 20) :
+            recent_models_info: List[Dict[str, Any]] = []
+            
+            try:                
+                
+                all_models = self.mlflow_client.search_model_versions(f"name='{model_name}'")
+
+                if not all_models:
+                    logger.info("No registered models found.")
+                    return recent_models_info
+                
+                # 2. Sort the versions by their version number in descending order        
+                sorted_versions = sorted(all_models, key=lambda mv: int(mv.version), reverse=True)
+                
+                # 3. Get the top '10' most recent versions
+                top_n_versions = sorted_versions[:no_recent_versions_to_consider]
+
+                 # 4. For each of the top 'top_n_versions' versions, retrieve its run details and metrics
+                for mv in top_n_versions:
+                    if mv.run_id:
+                        try:
+                            run = self.mlflow_client.get_run(mv.run_id)  
+                            recent_models_info.append({
+                                "model_name": mv.name,
+                                "model_version": mv.version,
+                                "run_id": mv.run_id,
+                                "metrics": run.data.metrics  
+                            })
+                        except Exception as error:
+                            logger.error(f"Could not retrieve run {mv.run_id} or its metrics for version {mv.version}: {error}")
+                    else:
+                        logger.info(f"Model version {mv.version} has no associated run_id.")
+
+                if recent_models_info:
+                    logger.info(f"\nSuccessfully retrieved {len(recent_models_info)} most recent versions for '{model_name}'.")
+                    return recent_models_info    
+
+            except Exception as e:
+                logger.error(f"Error fetching model details: {e}")
+                return recent_models_info
+    
+    
