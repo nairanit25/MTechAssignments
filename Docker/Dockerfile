@@ -32,6 +32,15 @@ RUN apt-get update && apt-get install -y \
 # Create non-root user
 RUN groupadd -r mlops && useradd -m -u 1001 -g mlops mlops
 
+# Set working directory
+WORKDIR /app
+
+# Create necessary directories (as root)
+RUN mkdir -p /app/models /app/data /app/logs
+
+# Set correct permissions
+RUN chmod -R 777 /app/logs && chown -R mlops:mlops /app
+
 # Copy virtual environment from builder stage
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -40,18 +49,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY src/ ./src/
 COPY configs/ ./configs/
 
-# Create necessary directories
-RUN mkdir -p /app/models /app/data /app/logs && chmod -R 777 /app/logs && \
-    chown -R mlops:mlops /app
- 
 # Switch to non-root user
 USER mlops
-
-# Set working directory
-WORKDIR /app
-
-# Copy source after switching to USER
-COPY --chown=mlops:mlops . .
 
 # Expose port
 EXPOSE 5000 8000
