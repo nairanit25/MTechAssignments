@@ -70,7 +70,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/Dockerfile
+          file: Docker/Dockerfile
           push: true
           tags: nairanit25/housing-mlops:latest
 
