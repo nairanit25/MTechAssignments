@@ -90,4 +90,9 @@ jobs:
 
       - name: Deploy using Docker Compose
         run: |
-          docker compose -f docker-compose.yml up
+          docker compose -f docker-compose.local.yml up -d
+
+      - name: Health check API
+        run: |
+          sleep 10
+          curl --fail http://localhost:8000/health || exit 1
