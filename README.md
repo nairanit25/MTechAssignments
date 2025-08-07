@@ -45,10 +45,20 @@ pip install -r requirements.txt
 
 ### Docker container creation
 a) install docker and start it as admin
-b) docker-compose up -d  #It will bring up the containers in docker
+b) docker-compose up --build --force-recreate #It will force build containers in docker
+docker-compose up -d  #It will bring up the containers in docker
 
 ### train the model
+###### Train linear_regression and Register all experiments in MLFlow under linear_regression_housing_price_predictor
 a) python.exe -m src.train.train_models --data-path .\data\california_housing.csv --algorithms  'linear_regression'
+###### Train decision_tree and Register all experiments in MLFlow under decision_tree_housing_price_predictor
+b) python.exe -m src.train.train_models --data-path .\data\california_housing.csv --algorithms  'decision_tree'
+
+### Select the best model and register it as housing_price_predictor
+a) python.exe -m src.models.best_model_selector
+
+### Run the application
+a) Restart the docker-container api-app and it will load the model for prediction.
 
 ### MLFlow Dashboard
-a) http://localhost:5000/#/models
+a) http://localhost:5000/
