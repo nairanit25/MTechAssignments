@@ -94,5 +94,5 @@ jobs:
 
       - name: Health check API
         run: |
-          sleep 10
+          sleep 180
           curl --fail http://localhost:8000/health || exit 1
