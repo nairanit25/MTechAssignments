@@ -82,6 +82,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Set up Docker
+        uses: docker/setup-docker@v2
+
       - name: Install Docker Compose
         run: |
           mkdir -p ~/.docker/cli-plugins
