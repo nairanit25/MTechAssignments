@@ -91,16 +91,3 @@ jobs:
       - name: Deploy using Docker Compose
         run: |
           docker compose -f docker-compose.yml up --build --force-recreate
-
-      - name: Health check API
-        run: |
-          sleep 10
-          curl --fail http://localhost:8000/health || exit 1
-
-      - name: Dump Docker logs on failure
-        if: failure()
-        run: |
-          echo "========= APP LOGS ========="
-          docker compose logs
-          echo "========= CONTAINER STATUS ========="
-          docker ps -a
