@@ -94,7 +94,7 @@ jobs:
 
       - name: Health check API
         run: |
-          sleep 90
+          sleep 10
           curl --fail http://localhost:8000/health || exit 1
 
       - name: Dump Docker logs on failure
