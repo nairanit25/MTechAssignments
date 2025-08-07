@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Create non-root user
-RUN groupadd -r mlops && useradd -r -g mlops mlops
+RUN groupadd -r mlops && useradd -m -u 1001 -g mlops mlops
 
 # Copy virtual environment from builder stage
 COPY --from=builder /opt/venv /opt/venv
@@ -39,8 +39,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copy application code
 COPY src/ ./src/
 COPY configs/ ./configs/
-
-RUN useradd -m -u 1001 mlops
 
 # Create necessary directories
 RUN mkdir -p /app/models /app/data /app/logs && chmod -R 777 /app/logs && \
