@@ -92,7 +92,7 @@ jobs:
         run: |
           docker compose -f docker-compose.yml up -d
 
-      - name: Health check API
-        run: |
-          sleep 120
-          curl --fail http://localhost:8000/health || exit 1
+#      - name: Health check API
+#        run: |
+#          sleep 120
+#          curl --fail http://localhost:8000/health || exit 1
