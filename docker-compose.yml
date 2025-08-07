@@ -67,6 +67,19 @@ services:
       - mlops-network
     restart: unless-stopped
 
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - mlops-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+
 
 
 
