@@ -72,7 +72,7 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/housing-mlops:latest
+          tags: nairanit25/housing-mlops:latest
 
   deploy:
     needs: docker-build-and-push
