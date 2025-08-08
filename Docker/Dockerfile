@@ -44,9 +44,8 @@ COPY src/ ./src/
 COPY configs/ ./configs/
 
 # Create necessary directories
-RUN mkdir -p /app/models /app/data /app/logs && chmod 777 /app/logs
-
-COPY . /app
+RUN mkdir -p /app/models /app/data /app/logs && \
+    chown -R mlops:mlops /app
 
 # Switch to non-root user
 USER mlops

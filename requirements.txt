@@ -11,6 +11,10 @@ dvc==3.50.1
 pydantic-settings>=2.9.2
 ydata_profiling==4.16.1
 prometheus_client>=0.17.1
+flake8==7.1.1
+mypy==1.11.1
+pytest==8.3.2
+pytest-mock==3.14.0
 #####
 #imblearn
 #evidently==0.4.18
