@@ -86,10 +86,44 @@
         }
       ],
       "id": 5
+    },
+    {
+      "type": "graph",
+      "title": "Model RMSE Comparison",
+      "targets": [
+        {
+          "expr": "training_rmse_lr",
+          "legendFormat": "Linear Regression",
+          "refId": "F"
+        },
+        {
+          "expr": "training_rmse_dt",
+          "legendFormat": "Decision Tree",
+          "refId": "G"
+        }
+      ],
+      "id": 6
+    },
+    {
+      "type": "graph",
+      "title": "Model R² Comparison",
+      "targets": [
+        {
+          "expr": "training_r2_lr",
+          "legendFormat": "Linear Regression",
+          "refId": "H"
+        },
+        {
+          "expr": "training_r2_dt",
+          "legendFormat": "Decision Tree",
+          "refId": "I"
+        }
+      ],
+      "id": 7
     }
   ],
   "schemaVersion": 27,
-  "version": 1,
+  "version": 2,
   "title": "Housing Prediction Monitoring",
   "timezone": "browser",
   "refresh": "5s"

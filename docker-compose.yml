@@ -23,6 +23,9 @@ services:
     depends_on:
       #- redis
       - mlflow
+      - localstack
+      - prometheus
+      - pushgateway
     networks:
       - mlops-network
     restart: unless-stopped
@@ -69,6 +72,17 @@ services:
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"
+    depends_on:
+      - pushgateway
+    networks:
+      - mlops-network
+    restart: unless-stopped
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: pushgateway
+    ports:
+      - "9091:9091"
     networks:
       - mlops-network
     restart: unless-stopped

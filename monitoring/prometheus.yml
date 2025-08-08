@@ -4,4 +4,10 @@ global:
 scrape_configs:
   - job_name: 'fastapi'
     static_configs:
-      - targets: ['api:8000']
+      - targets: ['api:8000']   # your API metrics endpoint
+
+  - job_name: 'pushgateway'
+    honor_labels: true
+    static_configs:
+      - targets: ['pushgateway:9091']
+

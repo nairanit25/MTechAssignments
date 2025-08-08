@@ -19,6 +19,7 @@ from src.utils.data_processor import DataLoader
 from src.utils.config import Settings
 from src.utils.logger import setup_logger
 import psutil as ps
+from prometheus_client import Gauge, CollectorRegistry, push_to_gateway
 
 # Setup logging
 logger = setup_logger(__name__, log_file="./logs/models.log")
@@ -102,6 +103,15 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, tria
         description='A linear regression model for the California Housing dataset, it was trained with the optimal hyperparameters identified by Optuna.'
         )  
         '''
+        # Training metrics (separate registry for Pushgateway)
+        training_registry_lr = CollectorRegistry()
+        train_rmse_gauge = Gauge('training_rmse_lr', 'Root Mean Squared Error', registry=training_registry_lr)
+        train_r2_gauge = Gauge('training_r2_lr', 'R-squared score', registry=training_registry_lr)
+
+        # Push metrics to Prometheus
+        train_rmse_gauge.set(val_metrics['val_rmse'])
+        train_r2_gauge.set(val_metrics['val_r2'])
+        push_to_gateway("http://localhost:9091", job="model_training_lr", registry=training_registry_lr)
 
         logger.info(f"Linear Regression - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")        
         return val_metrics['val_r2']  # Return metric for optimization
@@ -165,6 +175,18 @@ def train_decision_tree(X_train, y_train, X_val, y_val, X_test, y_test, trial=No
 
         registered_model_version = mlflow.sklearn.log_model(sk_model=model.model, artifact_path=artifact_path,  registered_model_name = registered_model_name )
 
+        # Training metrics (separate registry for Pushgateway)
+        training_registry_dt = CollectorRegistry()
+        train_rmse_gauge = Gauge('training_rmse_dt', 'Root Mean Squared Error', registry=training_registry_dt)
+        train_r2_gauge = Gauge('training_r2_dt', 'R-squared score', registry=training_registry_dt)
+
+        # Push metrics to Prometheus
+        train_rmse_gauge.set(val_metrics['val_rmse'])
+        train_r2_gauge.set(val_metrics['val_r2'])
+        push_to_gateway("http://localhost:9091", job="model_training_dt", registry=training_registry_dt)
+
+        train_rmse_gauge.set(val_metrics['val_rmse'])
+        train_r2_gauge.set(val_metrics['val_r2'])
         logger.info(f"Decision Tree - Val R²: {val_metrics['val_r2']:.4f}, Val RMSE: {val_metrics['val_rmse']:.2f}")
         
         return val_metrics['val_r2']
