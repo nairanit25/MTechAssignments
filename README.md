@@ -60,6 +60,18 @@ a) python.exe -m src.models.best_model_selector
 ### Run the application
 a) Restart the docker-container api-app and it will load the model for prediction.
 
+### Start Watcher for Retraining
+python -m src.train.watch_and_train
+
 ### MLFlow Dashboard
 a) http://localhost:5000/
+
+### Grafana Dashboard
+a) http://localhost:3000/d/780c417b-e8af-488d-89d4-dcf1eee3a50b/housing-prediction-monitoring-v2?orgId=1&from=now-24h&to=now&timezone=browser&refresh=5s
+
+### Prometheus Dashboard
+a) http://localhost:9090/query
+
+### Pushgateway UI
+a) http://localhost:9091
 
