@@ -63,4 +63,3 @@ a) Restart the docker-container api-app and it will load the model for predictio
 ### MLFlow Dashboard
 a) http://localhost:5000/
 
-
