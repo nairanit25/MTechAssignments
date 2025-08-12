@@ -75,3 +75,8 @@ a) http://localhost:9090/query
 ### Pushgateway UI
 a) http://localhost:9091
 
+### Docker Hub Image
+a) https://hub.docker.com/r/nairanit25/housing-mlops
+
+
+
